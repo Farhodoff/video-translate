@@ -25,6 +25,49 @@ document.addEventListener('DOMContentLoaded', () => {
         initDashboardPage();
     }
 
+    // Helper: Parse duration string (MM:SS or HH:MM:SS) to seconds
+    function parseDuration(durationStr) {
+        if (!durationStr) return 0;
+        const parts = durationStr.split(':').map(Number);
+        let seconds = 0;
+        if (parts.length === 3) {
+            seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+        } else if (parts.length === 2) {
+            seconds = parts[0] * 60 + parts[1];
+        } else {
+            seconds = parts[0];
+        }
+        return seconds;
+    }
+
+    // Timer Interval Reference
+    let countdownInterval;
+
+    function startCountdown(durationSec, btn, originalText) {
+        // M1 Pro Whisper Speed Factor approx 0.25 (4x faster than realtime) plus overhead
+        let remaining = Math.ceil(durationSec * 0.25) + 5; // +5 sec buffer
+
+        // Clear any existing
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        function updateDisplay() {
+            if (remaining <= 0) {
+                btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> So'nggi ishlovlar...`;
+                return;
+            }
+
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            const timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+            btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Qolgan vaqt: <span style="font-family:monospace; font-weight:700;">${timeStr}</span>`;
+            remaining--;
+        }
+
+        updateDisplay();
+        countdownInterval = setInterval(updateDisplay, 1000);
+    }
+
     // ==========================================
     // LANDING PAGE LOGIC
     // ==========================================
@@ -33,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 1. URL Analysis (Dublyaj Button) ---
         analyzeBtn.addEventListener('click', async (e) => {
-            e.preventDefault(); // Prevent accidental form submit if any
+            e.preventDefault();
 
             const url = urlInput.value.trim();
             if (!url) {
@@ -54,9 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (response.ok) {
-                    const proceed = confirm(`Video topildi: ${result.data.video_title}\nDavomiyligi: ${result.data.duration}\n\n"Dublyajlash" tugmasini bosib davom ettirasizmi?`);
+                    const durationSec = parseDuration(result.data.duration);
+
+                    const proceed = confirm(`Video topildi: ${result.data.video_title}\nDavomiyligi: ${result.data.duration}\n\nJarayonni boshlaysizmi?`);
+
                     if (proceed) {
-                        await startProcessing(url, result.data.video_title, analyzeBtn, originalText);
+                        await startProcessing(url, result.data.video_title, analyzeBtn, originalText, durationSec);
                     } else {
                         analyzeBtn.innerText = originalText;
                         analyzeBtn.disabled = false;
@@ -76,8 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // --- 2. URL Processing Action ---
-        async function startProcessing(url, title, btn, originalText) {
-            btn.innerText = "Yuklanmoqda... (Biroz kuting)";
+        async function startProcessing(url, title, btn, originalText, durationSec) {
+            startCountdown(durationSec, btn, originalText);
             try {
                 const formData = new FormData();
                 formData.append('url', url);
@@ -87,18 +133,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Extract safe filename for ID
+                    clearInterval(countdownInterval);
                     const pathParts = result.data.audio_path.split('/');
                     const fullFilename = pathParts[pathParts.length - 1];
                     const filename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
 
                     window.location.href = `/dashboard?project=${filename}`;
                 } else {
+                    clearInterval(countdownInterval);
                     alert("Xatolik: " + result.message);
                     btn.innerText = originalText;
                     btn.disabled = false;
                 }
             } catch (error) {
+                clearInterval(countdownInterval);
                 alert("Server xatosi: " + error.message);
                 btn.innerText = originalText;
                 btn.disabled = false;
@@ -107,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 3. File Upload ---
         if (uploadBtn) {
-            // Create hidden input dynamically
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = 'video/mp4,video/webm,video/quicktime,video/x-msvideo';
@@ -127,36 +174,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function uploadFile(file, btn) {
-            if (file.size > 100 * 1024 * 1024) { // 100MB
+            if (file.size > 100 * 1024 * 1024) {
                 alert("Fayl hajmi 100MB dan oshmasligi kerak!");
                 return;
             }
 
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Yuklanmoqda...`;
+            btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Tayyorlanmoqda...`;
             btn.style.pointerEvents = 'none';
 
-            try {
-                const formData = new FormData();
-                formData.append('file', file);
+            // Get Duration locally
+            const videoElement = document.createElement('video');
+            videoElement.preload = 'metadata';
+            videoElement.src = URL.createObjectURL(file);
 
-                const response = await fetch('/api/upload-video', { method: 'POST', body: formData });
-                const result = await response.json();
+            videoElement.onloadedmetadata = async function () {
+                window.URL.revokeObjectURL(videoElement.src);
+                const duration = videoElement.duration;
 
-                if (response.ok) {
-                    const name = file.name;
-                    const filename = name.substring(0, name.lastIndexOf('.')) || name;
-                    window.location.href = `/dashboard?project=${filename}`;
-                } else {
-                    alert("Yuklashda xatolik: " + result.message);
+                // Start Timer
+                startCountdown(duration, btn, originalHTML);
+
+                // Proceed with upload
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const response = await fetch('/api/upload-video', { method: 'POST', body: formData });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        clearInterval(countdownInterval); // Stop
+                        const name = file.name;
+                        const filename = name.substring(0, name.lastIndexOf('.')) || name;
+                        window.location.href = `/dashboard?project=${filename}`;
+                    } else {
+                        clearInterval(countdownInterval);
+                        alert("Yuklashda xatolik: " + result.message);
+                        btn.innerHTML = originalHTML;
+                        btn.style.pointerEvents = 'auto';
+                    }
+                } catch (error) {
+                    clearInterval(countdownInterval);
+                    console.error('Error:', error);
+                    alert("Server xatosi.");
                     btn.innerHTML = originalHTML;
                     btn.style.pointerEvents = 'auto';
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert("Server xatosi.");
-                btn.innerHTML = originalHTML;
-                btn.style.pointerEvents = 'auto';
             }
         }
     }
