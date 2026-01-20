@@ -47,9 +47,12 @@ pip install -r requirements.txt
 ```
 
 ### 4. Dasturni ishga tushirish
+Terminalda loyiha papkasida turib, quyidagi buyruqni bering:
+
 ```bash
-python3 main.py
+export PYTHONPATH=$PYTHONPATH:$(pwd) && python3 backend/main.py
 ```
+
 Server ishga tushgach, brauzerda **http://127.0.0.1:8000** manziliga kiring.
 
 ## 📂 Loyiha Tuzilmasi

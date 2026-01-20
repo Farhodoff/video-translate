@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio - AI Dublyaj</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="ph-fill ph-microphone-stage" style="color:var(--primary); font-size: 1.5rem;"></i>
+                <span>AI Dublyaj</span>
+            </div>
+
+            <div class="menu-group">
+                <div class="menu-group-label">Workspace</div>
+                <div class="nav-item active">
+                    <i class="ph ph-squares-four"></i> Project Dashboard
+                </div>
+                <div class="nav-item">
+                    <i class="ph ph-folder"></i> Shared Files
+                </div>
+            </div>
+
+            <div class="menu-group" style="margin-top: 30px;">
+                <div class="menu-group-label">Recent Projects</div>
+
+                <div class="project-card"
+                    style="background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div class="project-thumbnail">
+                        <div class="play-overlay"><i class="ph-fill ph-play" style="color:white;"></i></div>
+                    </div>
+                    <div style="font-size: 0.9rem; font-weight: 600;">Tech Review - EN to UZ</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Edited 2m ago</div>
+                </div>
+            </div>
+
+            <div style="margin-top: auto;">
+                <div style="background: var(--bg-card); padding: 15px; border-radius: 8px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+                        <span style="font-size:0.8rem; font-weight:600;">Storage</span>
+                        <span style="font-size:0.8rem; color: #2ecc71;">82%</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;">
+                        <div style="width: 82%; height: 100%; background: var(--primary); border-radius: 2px;"></div>
+                    </div>
+                    <button class="btn btn-outline"
+                        style="width: 100%; margin-top: 15px; font-size: 0.8rem; padding: 8px;">Upgrade Plan</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Editor -->
+        <main class="main-editor">
+            <div class="top-bar">
+                <div class="breadcrumbs">Projects > <span>Tech Review - EN to UZ</span></div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="status-badge"><i class="ph-fill ph-check-circle"></i> Autosaved</div>
+                    <button class="btn btn-primary" style="padding: 8px 16px;"><i class="ph ph-export"></i> Export
+                        Video</button>
+                </div>
+            </div>
+
+            <div class="editor-workspace">
+                <div class="video-container">
+                    <video id="main-video" controls style="width: 100%; height: 100%; object-fit: contain;">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+
+            <div class="bottom-panel"
+                style="background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 20px;">
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
+                            Transcription</div>
+                        <div style="font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 8px; height: 8px; background: #2ecc71; border-radius: 50%;"></div>
+                            Ready
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">AI
+                            Translation</div>
+                        <div style="font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%;">
+                            </div>
+                            Waiting
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button id="translate-btn" class="btn btn-primary"><i class="ph-fill ph-magic-wand"></i> Translate
+                        (Uzbek)</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Transcript Sidebar -->
+        <aside class="transcript-sidebar">
+            <div class="transcript-header">
+                Transcript Editor
+            </div>
+
+            <div class="transcript-columns">
+                <span>Time</span>
+                <span>Original (EN)</span>
+                <span>Uzbek (UZ)</span>
+            </div>
+
+            <div class="transcript-body" id="transcript-body">
+                <!-- Segments will be loaded here -->
+                <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+                    Loading project data...
+                </div>
+            </div>
+        </aside>
+
+    </div>
+    <script src="/static/script.js"></script>
+    </div>
+
+</body>
+
+</html>
