@@ -85,12 +85,29 @@ ul {
 }
 
 /* --- LANDING PAGE --- */
+/* --- LANDING PAGE --- */
 .landing-header {
-    padding: 20px 40px;
+    padding: 15px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    /* Liquidity Glass Effect */
+    background: rgba(11, 15, 21, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+/* Add padding to body or hero to compensate for fixed header */
+.hero-section {
+    padding-top: 140px;
+    /* Increased from 80px to account for header */
 }
 
 .brand {
@@ -106,15 +123,46 @@ ul {
     font-size: 1.5rem;
 }
 
+.nav-menu {
+    display: flex;
+    gap: 30px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px 25px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    /* Center positioning */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .nav-menu a {
     color: var(--text-muted);
-    margin: 0 15px;
     font-size: 0.95rem;
-    transition: color 0.2s;
+    font-weight: 500;
+    transition: all 0.2s;
+    position: relative;
 }
 
 .nav-menu a:hover {
     color: var(--text-white);
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: width 0.3s;
+    border-radius: 2px;
+}
+
+.nav-menu a:hover::after {
+    width: 100%;
 }
 
 .hero-section {
@@ -586,5 +634,26 @@ ul {
         height: 500px;
         border-left: none;
         border-top: 1px solid var(--border-color);
+    }
+}
+
+/* --- PRICING & FAQ RESPONSIVE --- */
+@media (max-width: 1024px) {
+    .pricing-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .pricing-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .faq-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .logos-section>div {
+        gap: 30px !important;
     }
 }

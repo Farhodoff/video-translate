@@ -169,6 +169,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project');
         const projectTitleElement = document.querySelector('.breadcrumbs span');
+        const saveBtn = document.getElementById('save-btn'); // NEW
+        const deleteBtn = document.getElementById('delete-btn'); // NEW
+
+        // Audio Settings
+        const voiceSelect = document.getElementById('voice-select');
+        const rateRange = document.getElementById('rate-range');
+        const rateValue = document.getElementById('rate-value');
+        const pitchRange = document.getElementById('pitch-range');
+        const pitchValue = document.getElementById('pitch-value');
+
+        // Init Sliders
+        if (rateRange && rateValue) {
+            rateRange.addEventListener('input', () => { rateValue.innerText = (rateRange.value >= 0 ? '+' : '') + rateRange.value + '%'; });
+        }
+        if (pitchRange && pitchValue) {
+            pitchRange.addEventListener('input', () => { pitchValue.innerText = (pitchRange.value >= 0 ? '+' : '') + pitchRange.value + 'Hz'; });
+        }
 
         let currentSegments = [];
 
@@ -182,6 +199,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Load Data
         fetchProjectData(projectId);
+
+        // --- Save Project Logic ---
+        if (saveBtn) {
+            saveBtn.addEventListener('click', async () => {
+                const originalHTML = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
+                saveBtn.disabled = true;
+
+                try {
+                    const response = await fetch(`/api/project/${projectId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ segments: currentSegments })
+                    });
+
+                    if (response.ok) {
+                        saveBtn.innerHTML = '<i class="ph ph-check"></i>';
+                        setTimeout(() => { saveBtn.innerHTML = '<i class="ph ph-floppy-disk"></i>'; saveBtn.disabled = false; }, 2000);
+                    } else {
+                        alert("Saqlashda xatolik.");
+                        saveBtn.innerHTML = originalHTML;
+                        saveBtn.disabled = false;
+                    }
+                } catch (e) {
+                    alert("Server xatosi");
+                    saveBtn.innerHTML = originalHTML;
+                    saveBtn.disabled = false;
+                }
+            });
+        }
+
+        // --- Delete Project Logic ---
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', async () => {
+                if (!confirm("Haqiqatan ham bu loyihani o'chirib tashlamoqchimisiz? Bu amalni qaytarib bo'lmaydi.")) return;
+
+                const originalHTML = deleteBtn.innerHTML;
+                deleteBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
+                deleteBtn.disabled = true;
+
+                try {
+                    const response = await fetch(`/api/project/${projectId}`, { method: 'DELETE' });
+
+                    if (response.ok) {
+                        alert("Loyiha o'chirildi!");
+                        window.location.href = "/";
+                    } else {
+                        alert("O'chirishda xatolik.");
+                        deleteBtn.innerHTML = originalHTML;
+                        deleteBtn.disabled = false;
+                    }
+                } catch (e) {
+                    alert("Server xatosi");
+                    deleteBtn.innerHTML = originalHTML;
+                    deleteBtn.disabled = false;
+                }
+            });
+        }
 
         async function fetchProjectData(id) {
             try {
@@ -214,20 +289,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            segments.forEach(seg => {
+            segments.forEach((seg, index) => {
                 const div = document.createElement('div');
                 div.className = 'segment-row';
 
                 const timeStart = new Date(seg.start * 1000).toISOString().substr(14, 5);
 
+                // Added contenteditable="true" and listeners
                 div.innerHTML = `
                     <div class="time-col">${timeStart}</div>
                     <div class="text-original">${seg.text}</div>
-                    <div class="text-translated">${seg.translated || '<i style="color:#666;">(Tarjima yo\'q)</i>'}</div>
+                    <div class="text-translated" contenteditable="true" style="outline:none; transition: border-bottom 0.2s;">
+                        ${seg.translated || ''} 
+                    </div>
+                     ${seg.translated ? `<button class="btn-play-audio" contenteditable="false" style="background:none; border:none; color:var(--primary); cursor:pointer; margin-left:8px;" title="Tinglash"><i class="ph-fill ph-speaker-high"></i></button>` : ''}
                 `;
 
-                // Click to jump video
-                div.addEventListener('click', () => {
+                const editable = div.querySelector('.text-translated');
+
+                // Focus: Highlight
+                editable.addEventListener('focus', () => {
+                    editable.style.borderBottom = '1px solid var(--primary)';
+                    div.classList.add('editing'); // custom class to avoid click conflicts
+                });
+
+                // Blur: Save to local state
+                editable.addEventListener('blur', () => {
+                    editable.style.borderBottom = 'none';
+                    div.classList.remove('editing');
+                    currentSegments[index].translated = editable.innerText.trim();
+                });
+
+                // Click to jump video (ignore if editing or clicking button)
+                div.addEventListener('click', (e) => {
+                    if (e.target.closest('.btn-play-audio') || e.target.closest('[contenteditable="true"]')) return;
+
                     videoPlayer.currentTime = seg.start;
                     videoPlayer.play();
 
@@ -235,6 +331,55 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('.segment-row').forEach(r => r.classList.remove('active'));
                     div.classList.add('active');
                 });
+
+                // Play Audio Handler
+                const playBtn = div.querySelector('.btn-play-audio');
+                if (playBtn) {
+                    playBtn.addEventListener('click', async () => {
+                        const icon = playBtn.querySelector('i');
+                        const originalIconClass = icon.className;
+
+                        icon.className = 'ph ph-spinner ph-spin'; // Loading state
+                        playBtn.disabled = true;
+
+                        try {
+                            // Gather Settings
+                            const voice = voiceSelect ? voiceSelect.value : "uz-UZ-MadinaNeural";
+                            const rate = rateValue ? rateValue.innerText : "+0%";
+                            const pitch = pitchValue ? pitchValue.innerText : "+0Hz";
+
+                            const formData = new FormData();
+                            formData.append('text', currentSegments[index].translated);
+                            formData.append('voice', voice);
+                            formData.append('rate', rate);
+                            formData.append('pitch', pitch);
+
+                            const response = await fetch('/api/generate-audio', {
+                                method: 'POST',
+                                body: formData
+                            });
+                            const result = await response.json();
+
+                            if (response.ok) {
+                                const audio = new Audio(result.audio_url);
+                                audio.play();
+
+                                audio.onended = () => {
+                                    icon.className = originalIconClass;
+                                    playBtn.disabled = false;
+                                };
+                            } else {
+                                alert("Ovoz generatsiya qilishda xatolik: " + result.message);
+                                icon.className = originalIconClass;
+                                playBtn.disabled = false;
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            icon.className = originalIconClass;
+                            playBtn.disabled = false;
+                        }
+                    });
+                }
 
                 transcriptBody.appendChild(div);
             });

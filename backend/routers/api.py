@@ -2,11 +2,46 @@ from fastapi import APIRouter, Form, UploadFile, File
 from fastapi.responses import JSONResponse
 import os
 import shutil
-from backend.services import video_service, transcription_service, translation_service
+from backend.services import video_service, transcription_service, translation_service, tts_service
+from backend.utils.text_normalizer import normalize_text
 from backend.models.schemas import TranslationRequest
+import uuid
+from backend.models.schemas import TranslationRequest
+import uuid
+
+# ... (existing code)
+
 
 router = APIRouter(prefix="/api")
 UPLOAD_DIR = "uploads"
+
+# --- 5. Generate Audio (TTS) ---
+@router.post("/generate-audio")
+async def generate_audio(
+    text: str = Form(...), 
+    voice: str = Form("uz-UZ-MadinaNeural"),
+    rate: str = Form("+0%"),
+    pitch: str = Form("+0Hz")
+):
+    try:
+        filename = f"tts_{uuid.uuid4()}.mp3"
+        output_path = os.path.join(UPLOAD_DIR, filename)
+        
+        # Normalize text for better pronounciation
+        normalized_text = normalize_text(text)
+        
+        success = await tts_service.generate_speech(normalized_text, output_path, voice, rate, pitch)
+        
+        if success:
+            return JSONResponse(content={
+                "status": "success",
+                "audio_url": f"/uploads/{filename}"
+            })
+        else:
+            return JSONResponse(content={"status": "error", "message": "TTS failed"}, status_code=500)
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+
 
 @router.get("/health")
 async def health_check():
@@ -85,9 +120,16 @@ async def translate_text(request: TranslationRequest):
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
 
-# --- 5. Get Project ---
+from backend.models.schemas import TranslationRequest, ProjectUpdateRequest
+
+# ... (rest of imports)
+
+# ... (existing code)
+
+# --- 5. Get Project (READ) ---
 @router.get("/project/{project_id}")
 async def get_project(project_id: str):
+    # ... (existing logic)
     # Search for video
     video_filename = None
     for ext in ['.mp4', '.mov', '.avi', '.webm']:
@@ -123,3 +165,47 @@ async def get_project(project_id: str):
             "segments": segments
         }
     })
+
+# --- 6. Update Project (UPDATE) ---
+@router.put("/project/{project_id}")
+async def update_project(project_id: str, request: ProjectUpdateRequest):
+    try:
+        json_path = os.path.join(UPLOAD_DIR, f"{project_id}.json")
+        if not os.path.exists(json_path):
+             return JSONResponse(content={"status": "error", "message": "Project not found"}, status_code=404)
+        
+        # Convert Pydantic models to dict
+        new_segments = [s.dict() for s in request.segments]
+        
+        # Save to file
+        import json
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump({"segments": new_segments}, f, ensure_ascii=False, indent=4)
+            
+        return JSONResponse(content={"status": "success", "message": "Project updated"})
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+
+# --- 7. Delete Project (DELETE) ---
+@router.delete("/project/{project_id}")
+async def delete_project(project_id: str):
+    try:
+        # 1. Delete JSON
+        json_path = os.path.join(UPLOAD_DIR, f"{project_id}.json")
+        if os.path.exists(json_path):
+            os.remove(json_path)
+            
+        # 2. Delete Video
+        video_deleted = False
+        for ext in ['.mp4', '.mov', '.avi', '.webm']:
+            video_path = os.path.join(UPLOAD_DIR, project_id + ext)
+            if os.path.exists(video_path):
+                os.remove(video_path)
+                video_deleted = True
+                break
+        
+        # 3. Delete TTS files (optional cleanup, maybe later)
+        
+        return JSONResponse(content={"status": "success", "message": "Project deleted"})
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)

@@ -17,3 +17,6 @@ class Segment(BaseModel):
     text: str
     original: Optional[str] = None
     translated: Optional[str] = None
+
+class ProjectUpdateRequest(BaseModel):
+    segments: List[Segment]
