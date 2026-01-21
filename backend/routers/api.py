@@ -1,19 +1,74 @@
-from fastapi import APIRouter, Form, UploadFile, File
+from fastapi import APIRouter, Form, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 import os
 import shutil
-from backend.services import video_service, transcription_service, translation_service, tts_service
+import uuid
+import json
+import traceback
+from backend.services import video_service, transcription_service, translation_service, tts_service, dubbing_service, notes_service
 from backend.utils.text_normalizer import normalize_text
-from backend.models.schemas import TranslationRequest
-import uuid
-from backend.models.schemas import TranslationRequest
-import uuid
-
-# ... (existing code)
-
+from backend.models.schemas import TranslationRequest, ProjectUpdateRequest
 
 router = APIRouter(prefix="/api")
 UPLOAD_DIR = "uploads"
+
+# --- WebSocket Export ---
+@router.websocket("/ws/export/{project_id}")
+async def export_websocket(websocket: WebSocket, project_id: str):
+    await websocket.accept()
+    try:
+        # 1. Find Video
+        video_filename = None
+        for ext in ['.mp4', '.mov', '.avi', '.webm']:
+            if os.path.exists(os.path.join(UPLOAD_DIR, project_id + ext)):
+                video_filename = project_id + ext
+                break
+        
+        if not video_filename:
+             await websocket.send_json({"status": "error", "message": "Video unavailable"})
+             await websocket.close()
+             return
+        
+        video_path = os.path.join(UPLOAD_DIR, video_filename)
+
+        # 2. Find Transcript
+        json_path = os.path.join(UPLOAD_DIR, f"{project_id}.json")
+        if not os.path.exists(json_path):
+             await websocket.send_json({"status": "error", "message": "Transcript not found"})
+             await websocket.close()
+             return
+        
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            segments = data.get('segments', []) if isinstance(data, dict) else data
+
+        # 3. Callback
+        async def send_progress(percent):
+            await websocket.send_json({"status": "progress", "percent": percent})
+
+        # 4. Process
+        result = await dubbing_service.generate_dubbed_video(
+            project_id, 
+            segments, 
+            video_path, 
+            UPLOAD_DIR,
+            progress_callback=send_progress
+        )
+        
+        await websocket.send_json({
+            "status": "complete",
+            "data": result
+        })
+        await websocket.close()
+
+    except Exception as e:
+        traceback.print_exc()
+        await websocket.send_json({"status": "error", "message": str(e)})
+        # Check if open before closing
+        try:
+            await websocket.close()
+        except:
+            pass
 
 # --- 5. Generate Audio (TTS) ---
 @router.post("/generate-audio")
@@ -120,16 +175,9 @@ async def translate_text(request: TranslationRequest):
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
 
-from backend.models.schemas import TranslationRequest, ProjectUpdateRequest
-
-# ... (rest of imports)
-
-# ... (existing code)
-
 # --- 5. Get Project (READ) ---
 @router.get("/project/{project_id}")
 async def get_project(project_id: str):
-    # ... (existing logic)
     # Search for video
     video_filename = None
     for ext in ['.mp4', '.mov', '.avi', '.webm']:
@@ -144,7 +192,6 @@ async def get_project(project_id: str):
     transcript_path = os.path.join(UPLOAD_DIR, project_id + ".json")
     segments = []
     if os.path.exists(transcript_path):
-        import json
         with open(transcript_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             # Handle both raw whisper format and our cleaned format
@@ -178,7 +225,6 @@ async def update_project(project_id: str, request: ProjectUpdateRequest):
         new_segments = [s.dict() for s in request.segments]
         
         # Save to file
-        import json
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump({"segments": new_segments}, f, ensure_ascii=False, indent=4)
             
@@ -204,8 +250,60 @@ async def delete_project(project_id: str):
                 video_deleted = True
                 break
         
-        # 3. Delete TTS files (optional cleanup, maybe later)
-        
         return JSONResponse(content={"status": "success", "message": "Project deleted"})
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+
+# --- 8. Meeting Notes (AI) ---
+@router.post("/project/{project_id}/notes")
+async def generate_notes(project_id: str):
+    try:
+        # 1. Load Transcript
+        json_path = os.path.join(UPLOAD_DIR, f"{project_id}.json")
+        if not os.path.exists(json_path):
+             return JSONResponse(content={"status": "error", "message": "Transcript not found"}, status_code=404)
+        
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            segments = data.get('segments', []) if isinstance(data, dict) else data
+
+        # 2. Combine text
+        full_text = " ".join([s.get('text', '') for s in segments])
+        
+        if not full_text.strip():
+             return JSONResponse(content={"status": "error", "message": "Transcript is empty"}, status_code=400)
+
+        # 3. Generate Notes
+        # Defaulting to Uzbek as per context, but could be dynamic
+        notes = notes_service.generate_meeting_notes(full_text, language="uz")
+        
+        if notes.get('error'):
+            return JSONResponse(content={"status": "error", "message": notes['message']}, status_code=400)
+
+        # 4. Save Notes
+        notes_path = os.path.join(UPLOAD_DIR, f"notes_{project_id}.json")
+        with open(notes_path, "w", encoding='utf-8') as f:
+            json.dump(notes, f, ensure_ascii=False, indent=4)
+
+        return JSONResponse(content={
+            "status": "success", 
+            "data": notes
+        })
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+
+@router.get("/project/{project_id}/notes")
+async def get_notes(project_id: str):
+    notes_path = os.path.join(UPLOAD_DIR, f"notes_{project_id}.json")
+    if os.path.exists(notes_path):
+        with open(notes_path, "r", encoding='utf-8') as f:
+            notes = json.load(f)
+        return JSONResponse(content={"status": "success", "data": notes})
+    else:
+        return JSONResponse(content={"status": "success", "data": None})
+
+
+# Legacy Export (HTTP) - Optional, can keep or remove. Keeping for robust fallback if needed, but WS handles it now.
+@router.post("/export/{project_id}")
+async def export_video(project_id: str):
+     return JSONResponse(content={"status": "error", "message": "Use WebSocket connection for export"}, status_code=400)

@@ -106,7 +106,11 @@
         <!-- Transcript Sidebar -->
         <aside class="transcript-sidebar">
             <div class="transcript-header">
-                Transcript Editor
+                <span>Transcript Editor</span>
+                <button id="notes-btn" class="btn btn-outline"
+                    style="padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; height: 28px; display: flex; align-items: center; gap: 6px;">
+                    <i class="ph ph-magic-wand"></i> AI Notes
+                </button>
             </div>
 
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
@@ -127,13 +131,13 @@
                     <div>
                         <label
                             style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Tezlik:
-                            <span id="rate-value">0%</span></label>
+                            <span id="rate-value">+0%</span></label>
                         <input type="range" id="rate-range" min="-50" max="50" value="0" step="5" style="width: 100%;">
                     </div>
                     <div>
                         <label
                             style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Ton:
-                            <span id="pitch-value">0Hz</span></label>
+                            <span id="pitch-value">+0Hz</span></label>
                         <input type="range" id="pitch-range" min="-20" max="20" value="0" step="2" style="width: 100%;">
                     </div>
                 </div>
@@ -154,6 +158,20 @@
         </aside>
 
     </div>
+    <!-- AI Notes Modal -->
+    <div id="notes-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="display:flex; align-items:center; gap:10px;"><i class="ph-fill ph-magic-wand"
+                        style="color:var(--primary); font-size:1.2rem;"></i> AI Meeting Notes</span>
+                <button class="modal-close" id="close-notes-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body" id="notes-body">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
     <script src="/static/script.js"></script>
     </div>
 

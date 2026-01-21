@@ -12,3 +12,4 @@ uploads/
 *.json
 !requirements.txt
 !DUBLYAJ_LOYIHA_SCHEMASI.md
+.env

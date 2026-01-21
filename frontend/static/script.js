@@ -223,7 +223,135 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-    }
+
+
+        // --- 4. Audio Recorder ---
+        const recordBtn = document.getElementById('record-btn-hero');
+        const recordingModal = document.getElementById('recording-modal');
+        const stopRecordingBtn = document.getElementById('stop-recording-btn');
+        const cancelRecordingBtn = document.getElementById('cancel-recording-btn');
+        const timerDisplay = document.getElementById('recording-timer');
+
+        let mediaRecorder;
+        let audioChunks = [];
+        let rInterval;
+        let rSeconds = 0;
+
+        if (recordBtn && recordingModal) {
+            recordBtn.addEventListener('click', async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    startRecording(stream);
+                } catch (err) {
+                    alert("Mikrofondan foydalanishga ruxsat berilmadi yoki xatolik: " + err);
+                }
+            });
+
+            function startRecording(stream) {
+                recordingModal.classList.add('open');
+                audioChunks = [];
+                rSeconds = 0;
+                timerDisplay.innerText = "00:00";
+
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+
+                // Timer
+                rInterval = setInterval(() => {
+                    rSeconds++;
+                    const m = Math.floor(rSeconds / 60);
+                    const s = rSeconds % 60;
+                    timerDisplay.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }, 1000);
+
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener("stop", async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioFile = new File([audioBlob], `recording_${Date.now()}.webm`, { type: 'audio/webm' });
+
+                    // UI Update: Show processing in Modal
+                    const originalModalBody = recordingModal.querySelector('.modal-body').innerHTML;
+                    recordingModal.querySelector('.modal-body').innerHTML = `
+                       <div style="padding: 30px; text-align: center;">
+                            <i class="ph ph-spinner ph-spin" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
+                            <h3 style="margin-bottom: 10px;">Yuklanmoqda va Tahlil qilinmoqda...</h3>
+                            <p style="color: var(--text-muted);">Iltimos kuting, bu biroz vaqt olishi mumkin.</p>
+                       </div>
+                   `;
+
+                    // Manually implementing upload logic here
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', audioFile);
+
+                        const response = await fetch('/api/upload-video', { method: 'POST', body: formData });
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            const name = audioFile.name;
+                            const filename = name.substring(0, name.lastIndexOf('.')) || name;
+                            window.location.href = `/dashboard?project=${filename}`;
+                        } else {
+                            alert("Yuklashda xatolik: " + result.message);
+                            recordingModal.querySelector('.modal-body').innerHTML = originalModalBody; // Restore
+                            setupModalListeners(); // Re-attach listeners since we wiped body
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert("Server xatosi: " + error.message);
+                        recordingModal.querySelector('.modal-body').innerHTML = originalModalBody;
+                        setupModalListeners();
+                    }
+
+                    // Stop all tracks 
+                    stream.getTracks().forEach(track => track.stop());
+                });
+            }
+
+            // Helper to re-attach listeners if we reset modal body content
+            function setupModalListeners() {
+                const newStopBtn = document.getElementById('stop-recording-btn');
+                const newCancelBtn = document.getElementById('cancel-recording-btn');
+
+                if (newStopBtn) {
+                    newStopBtn.addEventListener('click', () => {
+                        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                            mediaRecorder.stop();
+                            clearInterval(rInterval);
+                        }
+                    });
+                }
+                if (newCancelBtn) {
+                    newCancelBtn.addEventListener('click', () => {
+                        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                            mediaRecorder.stop();
+                        }
+                        recordingModal.classList.remove('open');
+                        window.location.reload();
+                    });
+                }
+            }
+
+            stopRecordingBtn.addEventListener('click', () => {
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                    clearInterval(rInterval);
+                }
+            });
+
+            cancelRecordingBtn.addEventListener('click', () => {
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                    clearInterval(rInterval);
+                }
+                recordingModal.classList.remove('open');
+                window.location.reload();
+            });
+        } // Closes if (recordBtn...)
+    } // Closes initLandingPage
 
     // ==========================================
     // DASHBOARD PAGE LOGIC
@@ -233,8 +361,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project');
         const projectTitleElement = document.querySelector('.breadcrumbs span');
-        const saveBtn = document.getElementById('save-btn'); // NEW
-        const deleteBtn = document.getElementById('delete-btn'); // NEW
+        const saveBtn = document.getElementById('save-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        // Find Export button by class and content if no ID, or add ID later. 
+        // Let's assume we will add id="export-btn" to dashboard.html
+        const exportBtn = document.getElementById('export-btn') || Array.from(document.querySelectorAll('button')).find(el => el.textContent.includes('Export'));
 
         // Audio Settings
         const voiceSelect = document.getElementById('voice-select');
@@ -322,26 +453,251 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // --- Export Video Logic ---
+        if (exportBtn) {
+            // --- Export Video Logic ---
+            if (exportBtn) {
+                exportBtn.addEventListener('click', async () => {
+                    const originalHTML = exportBtn.innerHTML;
+                    exportBtn.disabled = true;
+
+                    // 1. Auto-Save First!
+                    exportBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saqlanmoqda...';
+                    try {
+                        const saveResponse = await fetch(`/api/project/${projectId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ segments: currentSegments })
+                        });
+                        if (!saveResponse.ok) throw new Error("Avtomatik saqlash o'xshamadi");
+                    } catch (e) {
+                        console.error("Auto-save failed:", e);
+                        // Decide whether to stop or warn. Let's warn but try to proceed? 
+                        // No, prompt user.
+                        if (!confirm("Diqqat: Loyihani avtomatik saqlashda xatolik bo'ldi. Eski ma'lumotlar bilan davom ettirasizmi?")) {
+                            exportBtn.innerHTML = originalHTML;
+                            exportBtn.disabled = false;
+                            return;
+                        }
+                    }
+
+                    // 2. Start Export
+                    exportBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Ulanmoqda...';
+
+                    // WebSocket Connection
+                    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    const wsUrl = `${protocol}//${window.location.host}/api/ws/export/${projectId}`;
+                    console.log("Connecting to", wsUrl);
+
+                    const ws = new WebSocket(wsUrl);
+
+                    ws.onopen = () => {
+                        console.log("WS Connected");
+                        exportBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Boshlanmoqda...';
+                    };
+
+                    ws.onmessage = (event) => {
+                        const msg = JSON.parse(event.data);
+
+                        if (msg.status === 'progress') {
+                            exportBtn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Jarayonda: ${msg.percent}%`;
+                        }
+                        else if (msg.status === 'complete') {
+                            exportBtn.innerHTML = '<i class="ph ph-download-simple"></i> Yuklash...';
+
+                            // Create download links
+                            const result = msg.data;
+
+                            const videoLink = document.createElement('a');
+                            videoLink.href = result.video_url;
+                            videoLink.download = '';
+                            document.body.appendChild(videoLink);
+                            videoLink.click();
+                            document.body.removeChild(videoLink);
+
+                            setTimeout(() => {
+                                const srtLink = document.createElement('a');
+                                srtLink.href = result.srt_url;
+                                srtLink.download = '';
+                                document.body.appendChild(srtLink);
+                                srtLink.click();
+                                document.body.removeChild(srtLink);
+
+                                exportBtn.innerHTML = originalHTML;
+                                exportBtn.disabled = false;
+                            }, 1000);
+
+                            ws.close();
+                        }
+                        else if (msg.status === 'error') {
+                            alert("Xatolik: " + msg.message);
+                            exportBtn.innerHTML = originalHTML;
+                            exportBtn.disabled = false;
+                            ws.close();
+                        }
+                    };
+
+                    ws.onerror = (error) => {
+                        console.error("WS Error:", error);
+                        alert("Server bilan aloqa uzildi.");
+                        exportBtn.innerHTML = originalHTML;
+                        exportBtn.disabled = false;
+                    };
+
+                    ws.onclose = () => {
+                        if (exportBtn.disabled && exportBtn.innerText !== 'Yuklash...') {
+                            // handled by onerror usually
+                        }
+                    };
+                });
+            }
+
+            // --- AI Meeting Notes Logic ---
+            const notesBtn = document.getElementById('notes-btn');
+            const notesModal = document.getElementById('notes-modal');
+            const closeNotesBtn = document.getElementById('close-notes-modal');
+            const notesBody = document.getElementById('notes-body');
+
+            if (notesBtn && notesModal) {
+
+                function openModal() {
+                    notesModal.classList.add('open');
+                }
+
+                function closeModal() {
+                    notesModal.classList.remove('open');
+                }
+
+                if (closeNotesBtn) closeNotesBtn.addEventListener('click', closeModal);
+                notesModal.addEventListener('click', (e) => {
+                    if (e.target === notesModal) closeModal();
+                });
+
+                notesBtn.addEventListener('click', async () => {
+                    openModal();
+
+                    // Allow re-generation if empty or error
+                    if (!notesBody.querySelector('.notes-section')) {
+                        notesBody.innerHTML = `
+                        <div style="text-align:center; padding:40px; color:var(--text-muted);">
+                            <i class="ph ph-spinner ph-spin" style="font-size:2rem; color:var(--primary);"></i>
+                            <p style="margin-top:15px; font-size:0.9rem;">Sun'iy intellekt tahlil qilmoqda...</p>
+                        </div>
+                    `;
+
+                        try {
+                            // 1. Try to GET existing notes first
+                            let response = await fetch(`/api/project/${projectId}/notes`);
+                            let result = await response.json();
+
+                            if (result.status === 'success' && result.data) {
+                                renderNotes(result.data);
+                            } else {
+                                // 2. If 'empty' or not found, generate (POST)
+                                response = await fetch(`/api/project/${projectId}/notes`, { method: 'POST' });
+                                result = await response.json();
+
+                                if (response.ok && result.data && !result.data.error) {
+                                    renderNotes(result.data);
+                                } else {
+                                    throw new Error(result.message || "Unknown error");
+                                }
+                            }
+
+                        } catch (error) {
+                            notesBody.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">
+                            <i class="ph ph-warning-circle" style="font-size:2rem; margin-bottom:10px;"></i><br>
+                            Xatolik: ${error.message}<br><br>
+                            <small style="color:var(--text-muted);">Google API Key sozlanganligini tekshiring.</small>
+                        </div>`;
+                        }
+                    }
+                });
+
+                function renderNotes(data) {
+                    // Determine sentiment icon
+                    let sentimentIcon = 'ph-smiley';
+                    if (data.sentiment && String(data.sentiment).toLowerCase().includes('negative')) sentimentIcon = 'ph-smiley-sad';
+                    if (data.sentiment && String(data.sentiment).toLowerCase().includes('neutral')) sentimentIcon = 'ph-smiley-meh';
+
+                    let html = '';
+
+                    // Summary
+                    html += `
+                    <div class="notes-section">
+                        <div class="notes-title"><i class="ph-fill ph-text-align-left"></i> Qisqacha Mazmun</div>
+                        <div class="notes-text">${data.summary}</div>
+                    </div>
+                `;
+
+                    // Key Points
+                    if (data.key_points && data.key_points.length > 0) {
+                        html += `
+                        <div class="notes-section">
+                            <div class="notes-title"><i class="ph-fill ph-list-bullets"></i> Asosiy Nuqtalar</div>
+                            <ul class="notes-list">
+                                ${data.key_points.map(p => `<li>${p}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    }
+
+                    // Action Items
+                    if (data.action_items && data.action_items.length > 0) {
+                        html += `
+                        <div class="notes-section">
+                            <div class="notes-title"><i class="ph-fill ph-check-square"></i> Vazifalar (Action Items)</div>
+                            <ul class="notes-list">
+                                ${data.action_items.map(i => `<li>${i}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    }
+
+                    // Sentiment
+                    html += `
+                    <div class="notes-section" style="margin-bottom:0; padding-top:15px; border-top:1px solid var(--border-color);">
+                        <div style="font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+                            <i class="ph-fill ${sentimentIcon}" style="color:var(--primary);"></i>
+                            Kayfiyat: <span style="color:var(--text-white);">${data.sentiment}</span>
+                        </div>
+                    </div>
+                `;
+
+                    notesBody.innerHTML = html;
+                }
+            }
+
+        }
+
         async function fetchProjectData(id) {
+            console.log("Fetching project data for:", id);
             try {
                 const response = await fetch(`/api/project/${id}`);
                 const result = await response.json();
+                console.log("Project Data Response:", result);
 
                 if (response.ok) {
                     const data = result.data;
 
                     // 1. Setup Video
+                    console.log("Setting video src to:", data.video_url);
                     videoPlayer.src = data.video_url;
+                    videoPlayer.load(); // Force load
 
                     // 2. Setup Transcript
                     currentSegments = data.segments;
+                    console.log("Segments loaded:", currentSegments.length);
                     renderTranscript(currentSegments);
 
                 } else {
+                    console.error("Project fetch failed:", result.message);
                     transcriptBody.innerHTML = `<div style="padding:20px; color:red;">Xatolik: ${result.message}</div>`;
+                    alert("Loyihani yuklashda xatolik: " + result.message);
                 }
             } catch (error) {
                 console.error("Fetch error:", error);
+                alert("Server bilan aloqa xatoligi: " + error.message);
             }
         }
 
@@ -465,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const response = await fetch('/api/translate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ segments: currentSegments })
+                        body: JSON.stringify({ segments: currentSegments, target_lang: 'uz' })
                     });
                     const result = await response.json();
 
@@ -494,6 +850,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-    }
 
+    }
 });

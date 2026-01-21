@@ -46,10 +46,17 @@
 
             <div class="divider-text">YOKI</div>
 
-            <button class="upload-btn-full">
-                <i class="ph ph-upload-simple" style="color: var(--primary); font-size: 1.2rem;"></i>
-                Video faylni yuklash
-            </button>
+            <div style="display: flex; gap: 15px;">
+                <button class="upload-btn-full" style="flex:1;">
+                    <i class="ph ph-upload-simple" style="color: var(--primary); font-size: 1.2rem;"></i>
+                    Video/Audio yuklash
+                </button>
+                <button id="record-btn-hero" class="upload-btn-full"
+                    style="flex:1; border-color: #ef4444; color:#ef4444;">
+                    <i class="ph ph-microphone" style="font-size: 1.2rem;"></i>
+                    Ovoz yozish
+                </button>
+            </div>
         </div>
 
         <div class="hero-image">
@@ -344,6 +351,36 @@
             </div>
         </div>
     </footer>
+
+
+    <!-- Recording Modal -->
+    <div id="recording-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center;">
+                Ovoz Yozish
+            </div>
+            <div class="modal-body">
+                <div id="recording-status" style="margin-bottom: 20px;">
+                    <div
+                        style="width: 80px; height: 80px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                        <i class="ph-fill ph-microphone" style="font-size: 2.5rem; color: #ef4444;"></i>
+                    </div>
+                    <div id="recording-timer" style="font-size: 2rem; font-weight: 700; font-family: monospace;">00:00
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Yozilmoqda...</div>
+                </div>
+
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button id="stop-recording-btn" class="btn btn-primary" style="background: #ef4444; color: white;">
+                        <i class="ph-fill ph-stop"></i> To'xtatish
+                    </button>
+                    <button id="cancel-recording-btn" class="btn btn-outline">
+                        Bekor qilish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Script for interaction -->
     <script src="/static/script.js"></script>
