@@ -36,7 +36,7 @@ Django==5.2.3
 django-cors-headers==4.7.0
 django-posts==0.3.0
 djangorestframework==3.16.0
-djangorestframework_simplejwt==5.5.0
+djangorestframework_simplejwt
 docopt==0.6.2
 duckduckgo_search==8.0.4
 edge-tts==7.2.7
@@ -75,9 +75,9 @@ h11==0.14.0
 h2==4.3.0
 home==0.3.4
 hpack==4.1.0
-httpcore==0.17.3
+httpcore>=1.0.0
 httplib2==0.22.0
-httpx==0.24.1
+httpx==0.27.0
 httpx-sse==0.4.1
 hyperframe==6.1.0
 hyperlink==21.0.0
@@ -145,7 +145,7 @@ pydeck==0.9.1
 pydub==0.25.1
 Pygments==2.19.2
 pyjsparser==2.7.1
-PyJWT==2.10.1
+
 pyobjc==11.1
 pyobjc-core==11.1
 pyobjc-framework-Accessibility==11.1
@@ -317,12 +317,12 @@ python-bugzilla==3.3.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 python-multipart==0.0.20
-python-telegram-bot==20.3
+python-telegram-bot>=21.0
 pyttsx3==2.98
 pytz==2024.1
 PyYAML==6.0.2
 realtime==2.22.0
-redis==5.3.1
+redis
 referencing==0.36.2
 regex==2024.11.6
 requests==2.32.5
@@ -349,7 +349,7 @@ storage3==2.22.0
 streamlit==1.52.2
 StrEnum==0.4.15
 supabase==2.22.0
-supabase-auth==2.22.0
+supabase-auth
 supabase-functions==2.22.0
 sympy==1.13.1
 tabulate==0.9.0

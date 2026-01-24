@@ -70,3 +70,27 @@ video-translate/
 ## 📝 Muallif
 
 Farhodoff
+
+## 🚀 Deploy (Serverga joylash)
+
+Loyiha **Render**, **Railway** yoki **Heroku** kabi platformalarda ishlashga tayyorlangan.
+
+### Render.com orqali joylash (Tavsiya etiladi)
+
+1. **GitHub** ga loyihani yuklang.
+2. **Render.com** da ro'yxatdan o'ting.
+3. **Blueprints** bo'limiga o'ting va `New Blueprint Instance` tugmasini bosing.
+4. GitHub repozitoriysingizni ulang.
+5. `render.yaml` faylini avtomatik aniqlaydi va barcha sozlamalarni o'zi bajaradi.
+
+### Docker orqali ishga tushirish
+
+Agar siz Docker ishlatmoqchi bo'lsangiz:
+
+```bash
+# Docker imageni yaratish
+docker build -t video-translate .
+
+# Konteynerni ishga tushirish
+docker run -p 8000:8000 video-translate
+```
