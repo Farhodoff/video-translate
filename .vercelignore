@@ -10,3 +10,9 @@ uploads/
 .DS_Store
 tests/
 models/
+requirements.txt
+runtime.txt
+render.yaml
+Dockerfile
+Procfile
+backend/
