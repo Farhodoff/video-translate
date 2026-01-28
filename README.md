@@ -50,10 +50,18 @@ pip install -r requirements.txt
 Terminalda loyiha papkasida turib, quyidagi buyruqni bering:
 
 ```bash
-export PYTHONPATH=$PYTHONPATH:$(pwd) && python3 backend/main.py
+# Lokalda 127.0.0.1:9000 da ishga tushirish uchun (HOST va PORT o'zgaruvchilarini o'rnating)
+export PYTHONPATH=$PYTHONPATH:$(pwd) && HOST=127.0.0.1 PORT=9000 python3 backend/main.py
 ```
 
-Server ishga tushgach, brauzerda **http://127.0.0.1:8000** manziliga kiring.
+Server ishga tushgach, brauzerda **http://127.0.0.1:9000** manziliga kiring.
+
+Agar boshqa port yoki host kerak bo'lsa, `HOST` va `PORT` muhit o'zgaruvchilarini o'zgartiring. Masalan:
+
+```bash
+# Portni 8000 ga o'zgartirish
+export PYTHONPATH=$PYTHONPATH:$(pwd) && HOST=127.0.0.1 PORT=8000 python3 backend/main.py
+```
 
 ## 📂 Loyiha Tuzilmasi
 
@@ -73,15 +81,38 @@ Farhodoff
 
 ## 🚀 Deploy (Serverga joylash)
 
-Loyiha **Render**, **Railway** yoki **Heroku** kabi platformalarda ishlashga tayyorlangan.
+Loyiha **Render.com**, **Railway** yoki **Heroku** kabi platformalarda ishlashga tayyorlangan.
 
-### Render.com orqali joylash (Tavsiya etiladi)
+### Render.com orqali joylash (Tavsiya etiladi) ⭐
 
-1. **GitHub** ga loyihani yuklang.
-2. **Render.com** da ro'yxatdan o'ting.
-3. **Blueprints** bo'limiga o'ting va `New Blueprint Instance` tugmasini bosing.
-4. GitHub repozitoriysingizni ulang.
-5. `render.yaml` faylini avtomatik aniqlaydi va barcha sozlamalarni o'zi bajaradi.
+Render.com barcha AI funksiyalarni to'liq qo'llab-quvvatlaydi va deploy qilish juda oson.
+
+**Tezkor yo'l:**
+
+1. **GitHub** ga loyihani yuklang (allaqachon yuklangan)
+2. [Render.com](https://render.com) da ro'yxatdan o'ting
+3. **New + → Blueprint** ni tanlang
+4. `Farhodoff/video-translate` repositoriyasini ulang
+5. `GOOGLE_API_KEY` environment variable qo'shing
+6. **Apply** tugmasini bosing
+
+`render.yaml` fayli avtomatik aniqlaydi va barcha sozlamalarni bajaradi.
+
+**To'liq qo'llanma**: [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md) faylida batafsil ko'rsatmalar mavjud.
+
+**Environment Variables:**
+- `.env.example` faylini `.env` ga nusxalang
+- Kerakli API kalitlarni to'ldiring
+
+### Muhit o'zgaruvchilari (Environment Variables)
+
+Loyiha ishlashi uchun quyidagi o'zgaruvchilar kerak:
+
+```bash
+# Google AI API key (Meeting Notes feature uchun)
+GOOGLE_API_KEY=your_api_key_here
+```
+
 
 ### Docker orqali ishga tushirish
 
