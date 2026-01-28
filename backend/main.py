@@ -40,8 +40,5 @@ if __name__ == "__main__":
     import uvicorn
     # Make sure upload dir exists
     os.makedirs("uploads", exist_ok=True)
-    # Allow overriding host and port via environment variables (useful for local dev)
-    host = os.getenv("HOST", "127.0.0.1")
-    port = int(os.getenv("PORT", "9000"))
-    print(f"Server ishga tushmoqda: http://{host}:{port}")
-    uvicorn.run(app, host=host, port=port)
+    print("Server ishga tushmoqda: http://127.0.0.1:8000")
+    uvicorn.run(app, host="127.0.0.1", port=8000)
