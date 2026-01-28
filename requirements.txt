@@ -40,7 +40,7 @@ djangorestframework_simplejwt
 docopt==0.6.2
 duckduckgo_search==8.0.4
 edge-tts==7.2.7
-faiss-cpu==1.11.0
+faiss-cpu==1.13.2
 fastapi==0.118.3
 fedora-messaging-the-new-hotness-schema==1.2.1
 fedora_messaging==3.8.0
