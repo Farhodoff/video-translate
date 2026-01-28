@@ -1,0 +1,7 @@
+{
+    "version": 2,
+    "public": false,
+    "buildCommand": "mkdir -p dist/static && cp frontend/templates/*.html dist/ && cp frontend/static/* dist/static/",
+    "outputDirectory": "dist",
+    "framework": null
+}
