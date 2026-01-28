@@ -1,78 +1,72 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
-# Simple HTML homepage for testing
+html_content = """
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dublyaj Studiyasi - Vercel Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #2d2d2d;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: #10b981; margin-bottom: 0.5rem; }
+        p { color: #a1a1aa; line-height: 1.5; }
+        .b { font-weight: bold; color: #fff; }
+        .btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>✅ Ishlayapti!</h1>
+        <p>Vercel Serverless Function muvaffaqiyatli ishga tushdi.</p>
+        <br>
+        <p>Bu <span class="b">Test Versiya</span> bo'lib, faqat sayt ko'rinishini tekshirish uchun.</p>
+        <p>To'liq AI funksiyalar (video, audio) <br>faqat Render.com da ishlaydi.</p>
+        
+        <a href="https://render.com" class="btn">Render.com ga o'tish</a>
+    </div>
+</body>
+</html>
+"""
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
-    return """
-    <!DOCTYPE html>
-    <html lang="uz">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>AI Dublyaj Studiyasi - Vercel Test</title>
-        <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-            }
-            .container {
-                text-align: center;
-                padding: 40px;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 20px;
-                backdrop-filter: blur(10px);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            }
-            h1 { font-size: 3em; margin-bottom: 20px; }
-            p { font-size: 1.2em; margin: 10px 0; opacity: 0.9; }
-            .status { 
-                display: inline-block;
-                padding: 10px 20px;
-                background: #10b981;
-                border-radius: 25px;
-                margin-top: 20px;
-                font-weight: bold;
-            }
-            a {
-                color: #60a5fa;
-                text-decoration: none;
-                font-weight: 500;
-            }
-            a:hover { text-decoration: underline; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>🎬 AI Dublyaj Studiyasi</h1>
-            <p>Vercel test deployment muvaffaqiyatli!</p>
-            <div class="status">✅ Serverless Function Ishlayapti</div>
-            <p style="margin-top: 30px; font-size: 1em;">
-                To'liq funksional loyiha uchun 
-                <a href="https://render.com" target="_blank">Render.com</a> 
-                platformasiga o'ting
-            </p>
-        </div>
-    </body>
-    </html>
-    """
+    return html_content
 
 @app.get("/api/health")
 async def health_check():
-    return {
-        "status": "ok",
-        "message": "Vercel deployment successful",
-        "platform": "Vercel Serverless",
-        "note": "For full AI features, deploy to Render.com"
-    }
+    return {"status": "ok", "platform": "vercel-serverless"}
 
-# For Vercel
+# Vercel entry point
 handler = app

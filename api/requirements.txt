@@ -1,3 +1,2 @@
 fastapi
-jinja2
-python-multipart
+uvicorn
