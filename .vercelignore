@@ -1,0 +1,12 @@
+
+# Vercel Ignore File
+.venv
+myenv
+__pycache__
+*.pyc
+uploads/
+.git
+.idea
+.DS_Store
+tests/
+models/
