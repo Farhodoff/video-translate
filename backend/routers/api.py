@@ -50,7 +50,37 @@ def process_project_video(project_id: int, url: str, db: Session):
         transcript = transcription_service.transcribe_video(output_path)
         project.transcript = transcript
         
-        # 5. Complete
+        # 5. Translate
+        project.status = "Translating"
+        db.commit()
+        
+        print(f"Starting translation for project {project_id}...")
+        translated_segments = translation_service.translate_segments(transcript, target_lang='uz')
+        project.translated_transcript = translated_segments
+
+        # 6. Dubbing
+        project.status = "Dubbing"
+        db.commit()
+        
+        print(f"Starting dubbing for project {project_id}...")
+        # Output directory is same as video download dir
+        output_dir = os.path.dirname(output_path)
+        audio_path = await dubbing_service.create_dubbing(project_id, translated_segments, output_dir)
+        
+        project.dubbed_audio_url = f"/uploads/{os.path.basename(audio_path)}"
+
+        # 7. Merge Video & Audio
+        print(f"Merging video and audio for project {project_id}...")
+        final_video_filename = f"final_{project_id}.mp4"
+        final_video_path = os.path.join(output_dir, final_video_filename)
+        
+        # We need the original video path. 
+        # 'output_path' is the path to the downloaded video (full path).
+        dubbing_service.merge_video_audio(output_path, audio_path, final_video_path)
+        
+        project.final_video_url = f"/uploads/{final_video_filename}"
+
+        # 8. Complete
         project.status = "Ready"
         db.commit()
     except Exception as e:

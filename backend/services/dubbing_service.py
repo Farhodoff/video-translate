@@ -1,106 +1,108 @@
-import os
-import uuid
+import edge_tts
 import asyncio
-import re
+import os
 import subprocess
-from backend.utils.text_normalizer import normalize_text
+from pydub import AudioSegment
 
-async def generate_dubbed_video(project_id: str, segments: list, original_video_path: str, output_dir: str, progress_callback=None):
+VOICE = "uz-UZ-MadinaNeural" # High quality Uzbek voice
+
+def merge_video_audio(video_path: str, audio_path: str, output_path: str):
     """
-    Generates video with HARDCODED subtitles (burned in).
-    original audio is kept. Tracks progress.
+    Merges video and audio using ffmpeg.
+    Replaces original audio with the new audio track.
     """
-    
-    srt_filename = f"{project_id}.srt"
-    srt_path = os.path.join(output_dir, srt_filename)
-    
-    output_video_filename = f"{project_id}_subtitled.mp4"
-    output_video_path = os.path.join(output_dir, output_video_filename)
-
-    # 1. Generate SRT
-    print(f"Generating SRT for {len(segments)} segments...")
-    generate_srt(segments, srt_path)
-    
-    # Get duration for progress
-    total_duration = get_video_duration(original_video_path)
-    print(f"Video Duration: {total_duration}s")
-
-    # 2. Burn Subtitles using FFmpeg with PROGRESS
-    print("Burning subtitles into video...")
-    
     cmd = [
-        "ffmpeg", "-y",
-        "-i", original_video_path,
-        "-vf", f"subtitles={srt_path}:force_style='FontName=Arial,FontSize=24,PrimaryColour=&H00FFFFFF,BackColour=&H80000000,BorderStyle=4,Outline=0,Shadow=0,MarginV=30'",
-        "-c:a", "copy",
-        output_video_path
+        "ffmpeg",
+        "-y", # Overwrite output
+        "-i", video_path,
+        "-i", audio_path,
+        "-c:v", "copy", # Copy video stream (no re-encoding)
+        "-c:a", "aac", # Encode audio to AAC
+        "-map", "0:v:0", # Use video from first input
+        "-map", "1:a:0", # Use audio from second input
+        "-shortest", # Finish when the shorter stream ends
+        output_path
     ]
     
-    # Run async subprocess to read stderr
-    process = await asyncio.create_subprocess_exec(
-        *cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
-    )
+    print(f"Running merge command: {' '.join(cmd)}")
+    subprocess.run(cmd, check=True)
+    return output_path
 
-    # Read stderr for progress
-    # FFmpeg outputs to stderr: "frame=  235 fps=0.0 q=-1.0 size=    1536kB time=00:00:09.43 bitrate=1333.6kbits/s speed=18.6x"
-    
-    while True:
-        line = await process.stderr.readline()
-        if not line:
-            break
-            
-        line_text = line.decode('utf-8').strip()
-        # Parse time
-        match = re.search(r"time=(\d{2}):(\d{2}):(\d{2}\.\d+)", line_text)
-        if match and total_duration > 0:
-            h, m, s = match.groups()
-            current_seconds = int(h) * 3600 + int(m) * 60 + float(s)
-            percent = min(int((current_seconds / total_duration) * 100), 99)
-            
-            if progress_callback:
-                await progress_callback(percent)
-    
-    await process.wait()
-    
-    if progress_callback:
-        await progress_callback(100)
-    
-    return {
-        "video_url": f"/uploads/{output_video_filename}",
-        "srt_url": f"/uploads/{srt_filename}"
-    }
-
-def get_video_duration(path):
+async def generate_segment_audio(text: str, output_file: str) -> bool:
+    """
+    Generates audio for a single segment using edge-tts.
+    """
     try:
-        cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", path]
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        return float(result.stdout.strip())
-    except:
-        return 0
-
-def generate_srt(segments, output_path):
-    def format_time(seconds):
-        # SRT format: HH:MM:SS,mmm
-        millis = int((seconds - int(seconds)) * 1000)
-        seconds = int(seconds)
-        minutes = seconds // 60
-        hours = minutes // 60
-        minutes %= 60
-        seconds %= 60
-        return f"{hours:02d}:{minutes:02d}:{seconds:02d},{millis:03d}"
-
-    with open(output_path, 'w', encoding='utf-8') as f:
-        for i, seg in enumerate(segments):
-            start = format_time(seg['start'])
-            end = format_time(seg['end'])
-            text = seg.get('translated') or seg.get('text')
-            # DEBUG LOG
-            if i < 3: # Print first 3 for check
-                 print(f"SRT Segment {i}: Using text='{text}' (Has translated: {bool(seg.get('translated'))})")
-
+        if not text or not text.strip():
+            return False
             
-            f.write(f"{i+1}\n")
-            f.write(f"{start} --> {end}\n")
-            f.write(f"{text}\n\n")
+        communicate = edge_tts.Communicate(text, VOICE)
+        await communicate.save(output_file)
+        return True
+    except Exception as e:
+        print(f"Error generating audio for '{text}': {e}")
+        return False
+
+async def create_dubbing(project_id: int, translated_segments: list, output_dir: str) -> str:
+    """
+    Generates audio for all segments and merges them.
+    Returns the path to the final audio file.
+    """
+    print(f"Starting dubbing for project {project_id}...")
+    
+    # Create temp dir for segments
+    temp_dir = os.path.join(output_dir, f"temp_{project_id}")
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    final_audio = AudioSegment.silent(duration=0)
+    last_end_time = 0
+    
+    try:
+        for i, segment in enumerate(translated_segments):
+            text = segment.get('translated_text', '')
+            start_time_ms = int(segment['start'] * 1000)
+            end_time_ms = int(segment['end'] * 1000)
+            
+            if not text.strip():
+                continue
+                
+            # Generate audio for this segment
+            segment_file = os.path.join(temp_dir, f"seg_{i}.mp3")
+            success = await generate_segment_audio(text, segment_file)
+            
+            if success and os.path.exists(segment_file):
+                audio_segment = AudioSegment.from_mp3(segment_file)
+                
+                # Calculate silence padding
+                # Ensure we don't overlap or go back in time
+                silence_duration = max(0, start_time_ms - len(final_audio))
+                if silence_duration > 0:
+                    final_audio += AudioSegment.silent(duration=silence_duration)
+                
+                # Append audio
+                final_audio += audio_segment
+                
+                # Update duration tracking
+                # Note: We rely on the natural length of the TTS audio. 
+                # If it's longer than the video segment, it will push the next segments.
+                # Advanced logic would involve speed adjustment, but for MVP we append.
+                
+        # Export final
+        output_filename = f"dubbed_{project_id}.mp3"
+        output_path = os.path.join(output_dir, output_filename)
+        final_audio.export(output_path, format="mp3")
+        
+        print(f"Dubbing completed: {output_path}")
+        return output_path
+        
+    except Exception as e:
+        print(f"Dubbing failed: {e}")
+        raise e
+    finally:
+        # Cleanup temp files
+        try:
+            for f in os.listdir(temp_dir):
+                os.remove(os.path.join(temp_dir, f))
+            os.rmdir(temp_dir)
+        except Exception as cleanup_error:
+            print(f"Cleanup warning: {cleanup_error}")

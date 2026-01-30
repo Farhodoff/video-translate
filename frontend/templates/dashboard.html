@@ -253,10 +253,49 @@
                             <i class="ph ph-hourglass"></i> {{ project.status }}
                         </div>
                         {% endif %}
+                        {% if project.final_video_url %}
+                        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                            <div
+                                style="font-size: 0.75rem; color: var(--primary); font-weight: bold; margin-bottom: 5px;">
+                                🎬 Final Result (Uzbek)</div>
+                            <video controls style="width: 100%; border-radius: 8px; margin-bottom: 5px;">
+                                <source src="{{ project.final_video_url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <a href="{{ project.final_video_url }}" download class="btn btn-primary"
+                                style="width: 100%; font-size: 0.8rem; padding: 8px; text-align: center;">
+                                <i class="ph ph-download-simple"></i> Download Full Video
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        {% if project.dubbed_audio_url and not project.final_video_url %}
+                        {# Only show audio player if final video is not ready yet or as fallback #}
+                        <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px;">AI Dubbing
+                                (Uzbek)</div>
+                            <audio controls style="width: 100%; height: 30px;">
+                                <source src="{{ project.dubbed_audio_url }}" type="audio/mpeg">
+                                Your browser does not support the audio element.
+                            </audio>
+                            <a href="{{ project.dubbed_audio_url }}" download class="btn btn-outline"
+                                style="margin-top: 5px; width: 100%; font-size: 0.8rem; padding: 5px; text-align: center;">
+                                <i class="ph ph-download-simple"></i> Download Audio
+                            </a>
+                        </div>
+                        {% endif %}
+
                         {% if project.transcript %}
                         <div style="display: none;" id="transcript-data-{{ project.id }}">
                             {{ project.transcript | tojson | safe }}
                         </div>
+                        {% endif %}
+                        {% if project.translated_transcript %}
+                        <div style="display: none;" id="translated-data-{{ project.id }}">
+                            {{ project.translated_transcript | tojson | safe }}
+                        </div>
+                        {% endif %}
+                        {% if project.transcript %}
                         <button class="btn btn-outline" onclick="viewProjectTranscript('{{ project.id }}')"
                             style="margin-top: 10px; width: 100%; font-size: 0.8rem; padding: 8px;">
                             <i class="ph ph-article"></i> View Transcript
@@ -310,7 +349,7 @@
 
     <!-- Transcript Modal -->
     <div id="transcript-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
                 <span>Transcript</span>
                 <button class="modal-close" onclick="closeTranscriptModal()"><i class="ph ph-x"></i></button>
@@ -346,9 +385,27 @@
         function viewProjectTranscript(projectId) {
             try {
                 const dataDiv = document.getElementById(`transcript-data-${projectId}`);
-                if (dataDiv) {
-                    const transcriptData = JSON.parse(dataDiv.textContent);
-                    openTranscriptModal(transcriptData);
+                const translatedDiv = document.getElementById(`translated-data-${projectId}`);
+
+                let transcriptData = null;
+                let translatedData = null;
+
+                if (dataDiv) transcriptData = JSON.parse(dataDiv.textContent);
+                if (translatedDiv) translatedData = JSON.parse(translatedDiv.textContent);
+
+                // If we have translated data, use that as the primary source for the view
+                // because it contains BOTH if we structured it correctly, 
+                // OR we merge them. 
+                // Our translation service appends 'translated_text' to segments.
+                // But wait, the API saves `translated_transcript` as a separate column content.
+                // Let's check api.py... `project.translated_transcript = translated_segments`
+                // AND `translated_segments` is a COPY of segments with new field.
+                // So `translatedData` actually has everything we need!
+
+                if (translatedData) {
+                    openTranscriptModal(translatedData, true);
+                } else if (transcriptData) {
+                    openTranscriptModal(transcriptData, false);
                 }
             } catch (e) {
                 console.error("Error parsing transcript:", e);
@@ -356,18 +413,35 @@
             }
         }
 
-        function openTranscriptModal(transcriptData) {
+        function openTranscriptModal(segments, hasTranslation) {
             let html = '';
-            if (transcriptData && transcriptData.length > 0) {
-                html += '<div style="display: flex; flex-direction: column; gap: 15px;">';
-                transcriptData.forEach(segment => {
+            if (segments && segments.length > 0) {
+                html += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+
+                // Header
+                html += `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 10px; font-weight: bold; border-bottom: 1px solid var(--border-color); margin-bottom: 10px;">
+                        <div>Original (Source)</div>
+                        <div>${hasTranslation ? 'Uzbek (Translated)' : 'Translation Pending'}</div>
+                    </div>
+                `;
+
+                segments.forEach(segment => {
                     html += `
-                        <div style="display: flex; gap: 15px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                            <div style="min-width: 80px; color: var(--primary); font-family: monospace; font-size: 0.85rem;">
-                                ${formatTime(segment.start)}
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                            <!-- Original -->
+                            <div style="display: flex; gap: 10px;">
+                                <div style="min-width: 50px; color: var(--text-muted); font-family: monospace; font-size: 0.75rem;">
+                                    ${formatTime(segment.start)}
+                                </div>
+                                <div style="color: #e2e8f0; line-height: 1.5;">
+                                    ${segment.text}
+                                </div>
                             </div>
-                            <div style="color: #e2e8f0; line-height: 1.5;">
-                                ${segment.text}
+                            
+                            <!-- Translated -->
+                            <div style="color: var(--primary); line-height: 1.5;">
+                                ${hasTranslation ? (segment.translated_text || '...') : '<i style="color:var(--text-muted)">Not available yet</i>'}
                             </div>
                         </div>
                     `;

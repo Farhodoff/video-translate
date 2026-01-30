@@ -24,6 +24,9 @@ class Project(Base):
     thumbnail = Column(String, nullable=True)
     error_message = Column(String, nullable=True) # For handling failed downloads
     transcript = Column(JSON, nullable=True) # Store segments as JSON
+    translated_transcript = Column(JSON, nullable=True) # Store translated segments
+    dubbed_audio_url = Column(String, nullable=True) # URL to dubbed audio
+    final_video_url = Column(String, nullable=True) # URL to final merged video
     created_at = Column(DateTime, default=datetime.utcnow)
 
     owner = relationship("User", back_populates="projects")
