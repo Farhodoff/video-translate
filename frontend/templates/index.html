@@ -1,389 +1,1185 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uz">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI Dublyaj Studiyasi</title>
+        <link rel="stylesheet" href="/static/style.css" />
+        <script src="https://unpkg.com/@phosphor-icons/web"></script>
+        <link rel="icon" href="/favicon.ico" />
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Dublyaj Studiyasi</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="icon" href="/favicon.ico">
-</head>
-
-<body>
-
-    <!-- Landing Header -->
-    <header class="landing-header">
-        <div class="brand">
-            <i class="ph-fill ph-microphone-stage brand-icon"></i>
-            <span>AI Dublyaj <span style="color: var(--primary)">Studiyasi</span></span>
-        </div>
-        <nav class="nav-menu">
-            <a href="#">Asosiy</a>
-            <a href="#pricing">Tariflar</a>
-            <a href="#">Blog</a>
-        </nav>
-        <!-- <button class="btn btn-primary">Kirish</button> Removed as requested -->
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <div class="badge badge-info" style="display:inline-block; margin-bottom: 20px;">
-                Yangi: Whisper v3 Pro
+    <body>
+        <!-- Landing Header -->
+        <header class="landing-header">
+            <div class="brand">
+                <i class="ph-fill ph-microphone-stage brand-icon"></i>
+                <span>AI Dubbing</span>
             </div>
-            <h1>Global Videolarni<br><span>O'zbek Tiliga</span> O'giring</h1>
-            <p>
-                Whisper AI orqali 99% aniqlikdagi transkripsiya va eng so'nggi sun'iy intellekt modellar yordamida
-                tabiiy ovozli dublyaj xizmati.
-            </p>
-
-            <div class="url-input-container">
-                <i class="ph ph-link" style="color: var(--text-muted); font-size: 1.2rem; align-self: center;"></i>
-                <input type="text" placeholder="YouTube video URL manzilini kiriting...">
-                <button class="btn btn-primary">Dublyaj</button>
+            <nav class="nav-menu">
+                <a href="#">Asosiy</a>
+                <a href="#pricing">Tariflar</a>
+                <a href="#">Blog</a>
+            </nav>
+            <div style="display: flex; gap: 10px; align-items: center">
+                <a href="/login" class="btn btn-primary">Kirish</a>
+                <a href="/register" class="btn btn-primary"
+                    >Ro'yxatdan o'tish</a
+                >
             </div>
+        </header>
 
-            <div class="divider-text">YOKI</div>
-
-            <div style="display: flex; gap: 15px;">
-                <button class="upload-btn-full" style="flex:1;">
-                    <i class="ph ph-upload-simple" style="color: var(--primary); font-size: 1.2rem;"></i>
-                    Video/Audio yuklash
-                </button>
-                <button id="record-btn-hero" class="upload-btn-full"
-                    style="flex:1; border-color: #ef4444; color:#ef4444;">
-                    <i class="ph ph-microphone" style="font-size: 1.2rem;"></i>
-                    Ovoz yozish
-                </button>
-            </div>
-        </div>
-
-        <div class="hero-image">
-            <img src="/static/bg.png" alt="Dashboard Preview">
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section">
-        <div style="text-align: center; margin-bottom: 50px;">
-            <div class="badge badge-info" style="display:inline-block; margin-bottom: 15px; letter-spacing: 1px;">
-                TEXNOLOGIK LABORATORIYAMIZ</div>
-            <h2 class="section-label" style="font-size: 2.5rem; margin-bottom: 15px;">Platforma <span
-                    style="color: var(--primary)">Imkoniyatlari</span></h2>
-            <p style="color: var(--text-muted); max-width: 700px; margin: 0 auto; font-size: 1.1rem;">
-                Videolaringizni professional darajada mahalliylashtirish uchun eng ilg'or AI algoritmlari va bulutli
-                infratuzilma.
-            </p>
-        </div>
-
-        <div class="cards-grid">
-            <!-- 1. AI Transkripsiya -->
-            <div class="feature-card">
-                <div class="icon-box"><i class="ph-fill ph-user-sound"></i></div>
-                <h3>AI Transkripsiya</h3>
-                <p>OpenAI Whisper texnologiyasi asosida videolarni 99% aniqlikda va 50 dan ortiq tillarda matnga
-                    aylantiring.</p>
-                <a href="#"
-                    style="color: var(--primary); font-size: 0.9rem; text-decoration: none; font-weight: 600; margin-top: auto; display: inline-block;">Batafsil
-                    <i class="ph-bold ph-arrow-right"></i></a>
-            </div>
-
-            <!-- 2. Avtomatik Tarjima -->
-            <div class="feature-card">
-                <div class="icon-box"><i class="ph-fill ph-translate"></i></div>
-                <h3>Avtomatik Tarjima</h3>
-                <p>DeepL va Google Translate algoritmlari yordamida kontekstni saqlagan holda professional darajadagi
-                    lahzal tarjima.</p>
-                <a href="#"
-                    style="color: var(--primary); font-size: 0.9rem; text-decoration: none; font-weight: 600; margin-top: auto; display: inline-block;">Batafsil
-                    <i class="ph-bold ph-arrow-right"></i></a>
-            </div>
-
-            <!-- 3. Ovozni klonlash -->
-            <div class="feature-card">
-                <div class="icon-box"><i class="ph-fill ph-microphone-stage"></i></div>
-                <h3>Ovozni klonlash</h3>
-                <p>ElevenLabs texnologiyasi asosida asl ovoz tembri, emotsiyasi va intonatsiyasini saqlab qolgan holda
-                    dublyaj qilish.</p>
-                <a href="#"
-                    style="color: var(--primary); font-size: 0.9rem; text-decoration: none; font-weight: 600; margin-top: auto; display: inline-block;">Batafsil
-                    <i class="ph-bold ph-arrow-right"></i></a>
-            </div>
-
-            <!-- 4. Lip-Sync Texnologiyasi -->
-            <div class="feature-card">
-                <div class="icon-box"><i class="ph-fill ph-smiley"></i></div>
-                <h3>Lip-Sync Texnologiyasi</h3>
-                <p>Sun'iy intellekt yordamida personaj lab harakatlarini tarjima qilingan audio bilan soniya
-                    ulushlarigacha moslashtirish.</p>
-                <a href="#"
-                    style="color: var(--primary); font-size: 0.9rem; text-decoration: none; font-weight: 600; margin-top: auto; display: inline-block;">Batafsil
-                    <i class="ph-bold ph-arrow-right"></i></a>
-            </div>
-
-            <!-- 5. Subtitrlar Muharriri -->
-            <div class="feature-card">
-                <div class="icon-box"><i class="ph-fill ph-article"></i></div>
-                <h3>Subtitrlar Muharriri</h3>
-                <p>Tayyor subtitrlarni tahrirlash, vaqtni to'g'irlash va brendingiz ranglariga moslashtirish uchun qulay
-                    interfeys.</p>
-                <a href="#"
-                    style="color: var(--primary); font-size: 0.9rem; text-decoration: none; font-weight: 600; margin-top: auto; display: inline-block;">Batafsil
-                    <i class="ph-bold ph-arrow-right"></i></a>
-            </div>
-
-            <!-- 6. Sifat Nazorati -->
-            <div class="feature-card">
-                <div class="icon-box"><i class="ph-fill ph-check-circle"></i></div>
-                <h3>Sifat Nazorati</h3>
-                <p>Avtomatlashtirilgan tekshiruv va inson nazorati uyg'unligi orqali xatolarsiz natijani kafolatlaymiz.
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div
+                    class="badge badge-info"
+                    style="display: inline-block; margin-bottom: 20px"
+                >
+                    Yangi: Whisper v3 Pro
+                </div>
+                <h1>
+                    Global Videolarni<br /><span>O'zbek Tiliga</span> O'giring
+                </h1>
+                <p>
+                    Whisper AI orqali 99% aniqlikdagi transkripsiya va eng
+                    so'nggi sun'iy intellekt modellar yordamida tabiiy ovozli
+                    dublyaj xizmati.
                 </p>
-                <a href="#"
-                    style="color: var(--primary); font-size: 0.9rem; text-decoration: none; font-weight: 600; margin-top: auto; display: inline-block;">Batafsil
-                    <i class="ph-bold ph-arrow-right"></i></a>
-            </div>
-        </div>
-    </section>
 
-    <!-- Why Choose Us -->
-    <section class="why-us-section"
-        style="padding: 80px 20px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
-        <div
-            style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;">
-            <div>
-                <h2 style="font-size: 2.5rem; margin-bottom: 30px;">Nega bizni <br>tanlashadi?</h2>
-                <div style="display: flex; flex-direction: column; gap: 20px;">
-                    <div style="display: flex; align-items: center; gap: 15px; font-size: 1.1rem;">
-                        <i class="ph-fill ph-check-circle" style="color: var(--primary); font-size: 1.5rem;"></i>
-                        An'anaviy studiyalardan 10 baravar tezroq
+                <div class="url-input-container">
+                    <i
+                        class="ph ph-link"
+                        style="
+                            color: var(--text-muted);
+                            font-size: 1.2rem;
+                            align-self: center;
+                        "
+                    ></i>
+                    <input
+                        type="text"
+                        placeholder="YouTube video URL manzilini kiriting..."
+                    />
+                    <button class="btn btn-primary">Dublyaj</button>
+                </div>
+
+                <div class="divider-text">YOKI</div>
+
+                <div style="display: flex; gap: 15px">
+                    <button class="upload-btn-full" style="flex: 1">
+                        <i
+                            class="ph ph-upload-simple"
+                            style="color: var(--primary); font-size: 1.2rem"
+                        ></i>
+                        Video/Audio yuklash
+                    </button>
+                    <button
+                        id="record-btn-hero"
+                        class="upload-btn-full"
+                        style="flex: 1; border-color: #ef4444; color: #ef4444"
+                    >
+                        <i
+                            class="ph ph-microphone"
+                            style="font-size: 1.2rem"
+                        ></i>
+                        Ovoz yozish
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <img src="/static/bg.png" alt="Dashboard Preview" />
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div style="text-align: center; margin-bottom: 50px">
+                <div
+                    class="badge badge-info"
+                    style="
+                        display: inline-block;
+                        margin-bottom: 15px;
+                        letter-spacing: 1px;
+                    "
+                >
+                    TEXNOLOGIK LABORATORIYAMIZ
+                </div>
+                <h2
+                    class="section-label"
+                    style="font-size: 2.5rem; margin-bottom: 15px"
+                >
+                    Platforma
+                    <span style="color: var(--primary)">Imkoniyatlari</span>
+                </h2>
+                <p
+                    style="
+                        color: var(--text-muted);
+                        max-width: 700px;
+                        margin: 0 auto;
+                        font-size: 1.1rem;
+                    "
+                >
+                    Videolaringizni professional darajada mahalliylashtirish
+                    uchun eng ilg'or AI algoritmlari va bulutli infratuzilma.
+                </p>
+            </div>
+
+            <div class="cards-grid">
+                <!-- 1. AI Transkripsiya -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="ph-fill ph-user-sound"></i>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 15px; font-size: 1.1rem;">
-                        <i class="ph-fill ph-check-circle" style="color: var(--primary); font-size: 1.5rem;"></i>
-                        Xarajatlarni 85% gacha qisqartirish
+                    <h3>AI Transkripsiya</h3>
+                    <p>
+                        OpenAI Whisper texnologiyasi asosida videolarni 99%
+                        aniqlikda va 50 dan ortiq tillarda matnga aylantiring.
+                    </p>
+                    <a
+                        href="#"
+                        style="
+                            color: var(--primary);
+                            font-size: 0.9rem;
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-top: auto;
+                            display: inline-block;
+                        "
+                        >Batafsil <i class="ph-bold ph-arrow-right"></i
+                    ></a>
+                </div>
+
+                <!-- 2. Avtomatik Tarjima -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="ph-fill ph-translate"></i>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 15px; font-size: 1.1rem;">
-                        <i class="ph-fill ph-check-circle" style="color: var(--primary); font-size: 1.5rem;"></i>
-                        7/24 mavjud bulutli platforma
+                    <h3>Avtomatik Tarjima</h3>
+                    <p>
+                        DeepL va Google Translate algoritmlari yordamida
+                        kontekstni saqlagan holda professional darajadagi lahzal
+                        tarjima.
+                    </p>
+                    <a
+                        href="#"
+                        style="
+                            color: var(--primary);
+                            font-size: 0.9rem;
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-top: auto;
+                            display: inline-block;
+                        "
+                        >Batafsil <i class="ph-bold ph-arrow-right"></i
+                    ></a>
+                </div>
+
+                <!-- 3. Ovozni klonlash -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="ph-fill ph-microphone-stage"></i>
                     </div>
+                    <h3>Ovozni klonlash</h3>
+                    <p>
+                        ElevenLabs texnologiyasi asosida asl ovoz tembri,
+                        emotsiyasi va intonatsiyasini saqlab qolgan holda
+                        dublyaj qilish.
+                    </p>
+                    <a
+                        href="#"
+                        style="
+                            color: var(--primary);
+                            font-size: 0.9rem;
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-top: auto;
+                            display: inline-block;
+                        "
+                        >Batafsil <i class="ph-bold ph-arrow-right"></i
+                    ></a>
+                </div>
+
+                <!-- 4. Lip-Sync Texnologiyasi -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="ph-fill ph-smiley"></i>
+                    </div>
+                    <h3>Lip-Sync Texnologiyasi</h3>
+                    <p>
+                        Sun'iy intellekt yordamida personaj lab harakatlarini
+                        tarjima qilingan audio bilan soniya ulushlarigacha
+                        moslashtirish.
+                    </p>
+                    <a
+                        href="#"
+                        style="
+                            color: var(--primary);
+                            font-size: 0.9rem;
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-top: auto;
+                            display: inline-block;
+                        "
+                        >Batafsil <i class="ph-bold ph-arrow-right"></i
+                    ></a>
+                </div>
+
+                <!-- 5. Subtitrlar Muharriri -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="ph-fill ph-article"></i>
+                    </div>
+                    <h3>Subtitrlar Muharriri</h3>
+                    <p>
+                        Tayyor subtitrlarni tahrirlash, vaqtni to'g'irlash va
+                        brendingiz ranglariga moslashtirish uchun qulay
+                        interfeys.
+                    </p>
+                    <a
+                        href="#"
+                        style="
+                            color: var(--primary);
+                            font-size: 0.9rem;
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-top: auto;
+                            display: inline-block;
+                        "
+                        >Batafsil <i class="ph-bold ph-arrow-right"></i
+                    ></a>
+                </div>
+
+                <!-- 6. Sifat Nazorati -->
+                <div class="feature-card">
+                    <div class="icon-box">
+                        <i class="ph-fill ph-check-circle"></i>
+                    </div>
+                    <h3>Sifat Nazorati</h3>
+                    <p>
+                        Avtomatlashtirilgan tekshiruv va inson nazorati
+                        uyg'unligi orqali xatolarsiz natijani kafolatlaymiz.
+                    </p>
+                    <a
+                        href="#"
+                        style="
+                            color: var(--primary);
+                            font-size: 0.9rem;
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-top: auto;
+                            display: inline-block;
+                        "
+                        >Batafsil <i class="ph-bold ph-arrow-right"></i
+                    ></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us -->
+        <section
+            class="why-us-section"
+            style="
+                padding: 80px 20px;
+                border-top: 1px solid var(--border-color);
+                background: rgba(0, 0, 0, 0.2);
+            "
+        >
+            <div
+                style="
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 50px;
+                    align-items: center;
+                "
+            >
+                <div>
+                    <h2 style="font-size: 2.5rem; margin-bottom: 30px">
+                        Nega bizni <br />tanlashadi?
+                    </h2>
+                    <div
+                        style="display: flex; flex-direction: column; gap: 20px"
+                    >
+                        <div
+                            style="
+                                display: flex;
+                                align-items: center;
+                                gap: 15px;
+                                font-size: 1.1rem;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: var(--primary); font-size: 1.5rem"
+                            ></i>
+                            An'anaviy studiyalardan 10 baravar tezroq
+                        </div>
+                        <div
+                            style="
+                                display: flex;
+                                align-items: center;
+                                gap: 15px;
+                                font-size: 1.1rem;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: var(--primary); font-size: 1.5rem"
+                            ></i>
+                            Xarajatlarni 85% gacha qisqartirish
+                        </div>
+                        <div
+                            style="
+                                display: flex;
+                                align-items: center;
+                                gap: 15px;
+                                font-size: 1.1rem;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: var(--primary); font-size: 1.5rem"
+                            ></i>
+                            7/24 mavjud bulutli platforma
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    style="
+                        background: var(--bg-card);
+                        border: 1px solid var(--border-color);
+                        border-radius: 16px;
+                        padding: 40px;
+                        text-align: center;
+                    "
+                >
+                    <div
+                        style="
+                            font-size: 1rem;
+                            color: var(--text-muted);
+                            margin-bottom: 10px;
+                        "
+                    >
+                        Hozir boshlang
+                    </div>
+                    <div
+                        style="
+                            font-size: 3rem;
+                            font-weight: 700;
+                            margin-bottom: 20px;
+                        "
+                    >
+                        $0
+                        <span
+                            style="
+                                font-size: 1rem;
+                                font-weight: 400;
+                                color: var(--text-muted);
+                            "
+                            >/ sinov</span
+                        >
+                    </div>
+                    <a
+                        href="/register"
+                        class="btn btn-primary"
+                        style="width: 100%; padding: 15px"
+                    >
+                        Bepul sinab ko'ring
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section
+            class="pricing-section"
+            id="pricing"
+            style="padding: 100px 20px; max-width: 1200px; margin: 0 auto"
+        >
+            <div style="text-align: center; margin-bottom: 50px">
+                <div
+                    style="
+                        color: #8b5cf6;
+                        font-size: 0.8rem;
+                        font-weight: 700;
+                        letter-spacing: 1px;
+                        margin-bottom: 10px;
+                    "
+                >
+                    NARXLAR REJASI
+                </div>
+                <h2 style="font-size: 3rem; margin-bottom: 20px">
+                    O’zingizga mos tarifni <br />tanlang
+                </h2>
+                <p
+                    style="
+                        color: var(--text-muted);
+                        max-width: 600px;
+                        margin: 0 auto 30px;
+                    "
+                >
+                    Al yordamida videolaringizni dunyo bo'ylab tarqating.
+                    <br />Biznesingiz hajmi uchun mos paketni tanlang.
+                </p>
+
+                <div
+                    class="pricing-toggle"
+                    style="
+                        background: var(--bg-card);
+                        display: inline-flex;
+                        padding: 5px;
+                        border-radius: 50px;
+                        border: 1px solid var(--border-color);
+                    "
+                >
+                    <button
+                        class="active"
+                        id="btn-monthly"
+                        style="
+                            background: var(--bg-dark);
+                            color: white;
+                            border: none;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 0.9rem;
+                            font-weight: 600;
+                            cursor: pointer;
+                        "
+                    >
+                        Oylik
+                    </button>
+                    <button
+                        id="btn-annual"
+                        style="
+                            background: transparent;
+                            color: var(--text-muted);
+                            border: none;
+                            padding: 8px 20px;
+                            border-radius: 20px;
+                            font-size: 0.9rem;
+                            font-weight: 600;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 5px;
+                        "
+                    >
+                        Yillik
+                        <span
+                            style="
+                                background: #10b981;
+                                color: black;
+                                font-size: 0.7rem;
+                                padding: 2px 6px;
+                                border-radius: 10px;
+                            "
+                            >-20%</span
+                        >
+                    </button>
                 </div>
             </div>
 
             <div
-                style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 40px; text-align: center;">
-                <div style="font-size: 1rem; color: var(--text-muted); margin-bottom: 10px;">Hozir boshlang</div>
-                <div style="font-size: 3rem; font-weight: 700; margin-bottom: 20px;">$0 <span
-                        style="font-size: 1rem; font-weight: 400; color: var(--text-muted);">/ sinov</span></div>
-                <button class="btn btn-primary" style="width: 100%; padding: 15px;">Bepul sinab ko'ring</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section class="pricing-section" id="pricing" style="padding: 100px 20px; max-width: 1200px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 50px;">
-            <div style="color: #8b5cf6; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">
-                NARXLAR REJASI</div>
-            <h2 style="font-size: 3rem; margin-bottom: 20px;">O’zingizga mos tarifni <br>tanlang</h2>
-            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 30px;">
-                Al yordamida videolaringizni dunyo bo'ylab tarqating. <br>Biznesingiz hajmi uchun mos paketni tanlang.
-            </p>
-
-            <div class="pricing-toggle"
-                style="background: var(--bg-card); display: inline-flex; padding: 5px; border-radius: 50px; border: 1px solid var(--border-color);">
-                <button class="active"
-                    style="background: var(--bg-dark); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer;">Oylik</button>
-                <button
-                    style="background: transparent; color: var(--text-muted); border: none; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;">Yillik
-                    <span
-                        style="background: #10b981; color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px;">-20%</span></button>
-            </div>
-        </div>
-
-        <div class="pricing-grid"
-            style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; align-items: flex-start;">
-            <!-- Free -->
-            <div class="pricing-card"
-                style="background: var(--bg-card); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%;">
-                <h3>Bepul</h3>
-                <div class="price" style="font-size: 3rem; font-weight: 700; margin: 15px 0;">$0 <span
-                        style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/oy</span></div>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px;">Sinov uchun eng yaxshi
-                    tanlov.</p>
-                <ul class="features-list"
-                    style="margin-bottom: 30px; display: flex; flex-direction: column; gap: 15px;">
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> 5 daqiqa video/oy</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> Standart ovozlar (10+)</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> 720p HD sifat</li>
-                    <li class="disabled"
-                        style="display: flex; gap: 10px; align-items: center; color: var(--text-muted); text-decoration: line-through;">
-                        <i class="ph ph-x"></i> Suv belgisi bilan
-                    </li>
-                </ul>
-                <button class="btn btn-outline" style="width: 100%; margin-top: auto;">Hozir boshlash</button>
-            </div>
-
-            <!-- Professional -->
-            <div class="pricing-card featured"
-                style="background: linear-gradient(180deg, rgba(88, 28, 135, 0.4) 0%, rgba(15, 23, 42, 1) 100%); padding: 30px; border-radius: 16px; border: 1px solid #8b5cf6; position: relative; display: flex; flex-direction: column; height: 100%; transform: scale(1.05); box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);">
-                <div class="popular-badge"
-                    style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
-                    ENG MASHHUR</div>
-                <h3 style="color: #a78bfa;">Professional</h3>
-                <div class="price" style="font-size: 3rem; font-weight: 700; margin: 15px 0;">$29 <span
-                        style="font-size: 1rem; color: rgba(255,255,255,0.7); font-weight: 400;">/oy</span></div>
-                <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 30px;">Tartibli kontent
-                    yaratuvchilar uchun.</p>
-                <ul class="features-list"
-                    style="margin-bottom: 30px; display: flex; flex-direction: column; gap: 15px;">
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> 60 daqiqa video/oy</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> Voice Cloning (Ovoz kloni)</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> 4K Ultra HD Eksport</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> Priority support (24/7)</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> Suv belgisiz</li>
-                </ul>
-                <button class="btn btn-primary"
-                    style="width: 100%; margin-top: auto; background: #8b5cf6; border: none; color: white;">Hozir
-                    boshlash</button>
-            </div>
-
-            <!-- Studio -->
-            <div class="pricing-card"
-                style="background: var(--bg-card); padding: 30px; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%;">
-                <h3>Studio</h3>
-                <div class="price" style="font-size: 3rem; font-weight: 700; margin: 15px 0;">$99 <span
-                        style="font-size: 1rem; color: var(--text-muted); font-weight: 400;">/oy</span></div>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px;">Professional agentliklar va
-                    jamoalar uchun.</p>
-                <ul class="features-list"
-                    style="margin-bottom: 30px; display: flex; flex-direction: column; gap: 15px;">
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> 300 daqiqa video/oy</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> Jamoaviy boshqaruv (5 kishi)</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> To'liq API kirish</li>
-                    <li style="display: flex; gap: 10px; align-items: center;"><i class="ph-fill ph-check-circle"
-                            style="color: #8b5cf6;"></i> Maxsus menejer</li>
-                </ul>
-                <button class="btn btn-outline" style="width: 100%; margin-top: auto;">Hozir boshlash</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Logos Section Removed -->
-
-    <!-- FAQ Section -->
-    <section class="faq-section" style="padding: 100px 20px; max-width: 900px; margin: 0 auto;">
-        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 50px;">Ko’p so’raladigan savollar</h2>
-        <div class="faq-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-            <div class="faq-card"
-                style="background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <h4 style="margin-bottom: 10px; font-size: 1.1rem;">Qachon tarifni o’zgartira olaman?</h4>
-                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
-                    Siz istalgan vaqtda tarifingizni oshirishingiz yoki bekor qilishingiz mumkin. O’zgarish darhol
-                    kuchga kiradi.
-                </p>
-            </div>
-            <div class="faq-card"
-                style="background: var(--bg-card); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <h4 style="margin-bottom: 10px; font-size: 1.1rem;">Voice Cloning qanday ishlaydi?</h4>
-                <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
-                    Shunchaki 30 soniyalik audio namunani yuklaysiz va AI sizning ovozingizni aniq nusxasini yaratadi.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer style="padding: 60px 20px; border-top: 1px solid var(--border-color); margin-top: 50px;">
-        <div
-            style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;">
-            <div>
-                <div class="brand" style="margin-bottom: 20px;">
-                    <i class="ph-fill ph-microphone-stage brand-icon"></i>
-                    <span>AI Dublyaj Studiyasi</span>
-                </div>
-                <p style="color: var(--text-muted); line-height: 1.6;">
-                    Biz video kontent yaratuvchilarga o'z g'oyalarini dunyo bo'ylab tarqatishda yordam beramiz.
-                    Sun'iy intellekt orqali til to'siqlarini parchalaymiz.
-                </p>
-            </div>
-            <div>
-                <h4 style="margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 1px;">PLATFORMA</h4>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="#" style="color: var(--text-muted); text-decoration: none;">API</a>
-                    <a href="#" style="color: var(--text-muted); text-decoration: none;">Xavfsizlik</a>
-                    <a href="#" style="color: var(--text-muted); text-decoration: none;">Hujjatlar</a>
-                </div>
-            </div>
-            <div>
-                <h4 style="margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 1px;">KOMPANIYA</h4>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="#" style="color: var(--text-muted); text-decoration: none;">Biz haqimizda</a>
-                    <a href="#" style="color: var(--text-muted); text-decoration: none;">Blog</a>
-                    <a href="#" style="color: var(--text-muted); text-decoration: none;">Vakansiyalar</a>
-                </div>
-            </div>
-            <div>
-                <h4 style="margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 1px;">IJTIMOIY</h4>
-                <div style="display: flex; gap: 15px;">
-                    <i class="ph-fill ph-globe" style="font-size: 1.5rem; color: var(--text-muted);"></i>
-                    <i class="ph-fill ph-instagram-logo" style="font-size: 1.5rem; color: var(--text-muted);"></i>
-                    <i class="ph-fill ph-telegram-logo" style="font-size: 1.5rem; color: var(--text-muted);"></i>
-                </div>
-            </div>
-        </div>
-        <div
-            style="max-width: 1200px; margin: 50px auto 0; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 30px; display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.8rem;">
-            <div>© 2026 AI Dublyaj Studiyasi. Barcha huquqlar himoyalangan.</div>
-            <div style="display: flex; gap: 20px;">
-                <a href="#" style="color: var(--text-muted); text-decoration: none;">Maxfiylik siyosati</a>
-                <a href="#" style="color: var(--text-muted); text-decoration: none;">Foydalanish shartlari</a>
-            </div>
-        </div>
-    </footer>
-
-
-    <!-- Recording Modal -->
-    <div id="recording-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <div class="modal-header" style="justify-content: center;">
-                Ovoz Yozish
-            </div>
-            <div class="modal-body">
-                <div id="recording-status" style="margin-bottom: 20px;">
+                class="pricing-grid"
+                style="
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 30px;
+                    align-items: flex-start;
+                "
+            >
+                <!-- Free -->
+                <div
+                    class="pricing-card"
+                    style="
+                        background: var(--bg-card);
+                        padding: 30px;
+                        border-radius: 16px;
+                        border: 1px solid var(--border-color);
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    "
+                >
+                    <h3>Bepul</h3>
                     <div
-                        style="width: 80px; height: 80px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
-                        <i class="ph-fill ph-microphone" style="font-size: 2.5rem; color: #ef4444;"></i>
+                        class="price"
+                        style="
+                            font-size: 3rem;
+                            font-weight: 700;
+                            margin: 15px 0;
+                        "
+                    >
+                        $0
+                        <span
+                            style="
+                                font-size: 1rem;
+                                color: var(--text-muted);
+                                font-weight: 400;
+                            "
+                            >/oy</span
+                        >
                     </div>
-                    <div id="recording-timer" style="font-size: 2rem; font-weight: 700; font-family: monospace;">00:00
-                    </div>
-                    <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Yozilmoqda...</div>
+                    <p
+                        style="
+                            color: var(--text-muted);
+                            font-size: 0.9rem;
+                            margin-bottom: 30px;
+                        "
+                    >
+                        Sinov uchun eng yaxshi tanlov.
+                    </p>
+                    <ul
+                        class="features-list"
+                        style="
+                            margin-bottom: 30px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 15px;
+                        "
+                    >
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            5 daqiqa video/oy
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            Standart ovozlar (10+)
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            720p HD sifat
+                        </li>
+                        <li
+                            class="disabled"
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                                color: var(--text-muted);
+                                text-decoration: line-through;
+                            "
+                        >
+                            <i class="ph ph-x"></i> Suv belgisi bilan
+                        </li>
+                    </ul>
+                    <a
+                        href="/register"
+                        class="btn btn-outline"
+                        style="width: 100%; margin-top: auto"
+                    >
+                        Hozir boshlash
+                    </a>
                 </div>
 
-                <div style="display: flex; gap: 15px; justify-content: center;">
-                    <button id="stop-recording-btn" class="btn btn-primary" style="background: #ef4444; color: white;">
-                        <i class="ph-fill ph-stop"></i> To'xtatish
-                    </button>
-                    <button id="cancel-recording-btn" class="btn btn-outline">
-                        Bekor qilish
-                    </button>
+                <!-- Professional -->
+                <div
+                    class="pricing-card featured"
+                    style="
+                        background: linear-gradient(
+                            180deg,
+                            rgba(88, 28, 135, 0.4) 0%,
+                            rgba(15, 23, 42, 1) 100%
+                        );
+                        padding: 30px;
+                        border-radius: 16px;
+                        border: 1px solid #8b5cf6;
+                        position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                        transform: scale(1.05);
+                        box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+                    "
+                >
+                    <div
+                        class="popular-badge"
+                        style="
+                            position: absolute;
+                            top: -12px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #8b5cf6;
+                            color: white;
+                            padding: 4px 12px;
+                            border-radius: 20px;
+                            font-size: 0.75rem;
+                            font-weight: 700;
+                            text-transform: uppercase;
+                        "
+                    >
+                        ENG MASHHUR
+                    </div>
+                    <h3 style="color: #a78bfa">Professional</h3>
+                    <div
+                        class="price"
+                        style="
+                            font-size: 3rem;
+                            font-weight: 700;
+                            margin: 15px 0;
+                        "
+                    >
+                        $<span id="price-pro-amount">29</span>
+                        <span
+                            id="price-pro-period"
+                            style="
+                                font-size: 1rem;
+                                color: rgba(255, 255, 255, 0.7);
+                                font-weight: 400;
+                            "
+                            >/oy</span
+                        >
+                    </div>
+                    <p
+                        style="
+                            color: rgba(255, 255, 255, 0.7);
+                            font-size: 0.9rem;
+                            margin-bottom: 30px;
+                        "
+                    >
+                        Tartibli kontent yaratuvchilar uchun.
+                    </p>
+                    <ul
+                        class="features-list"
+                        style="
+                            margin-bottom: 30px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 15px;
+                        "
+                    >
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            60 daqiqa video/oy
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            Voice Cloning (Ovoz kloni)
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            4K Ultra HD Eksport
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            Priority support (24/7)
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            Suv belgisiz
+                        </li>
+                    </ul>
+                    <a
+                        href="/register"
+                        class="btn btn-primary"
+                        style="
+                            width: 100%;
+                            margin-top: auto;
+                            background: #8b5cf6;
+                            border: none;
+                            color: white;
+                        "
+                    >
+                        Hozir boshlash
+                    </a>
+                </div>
+
+                <!-- Studio -->
+                <div
+                    class="pricing-card"
+                    style="
+                        background: var(--bg-card);
+                        padding: 30px;
+                        border-radius: 16px;
+                        border: 1px solid var(--border-color);
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    "
+                >
+                    <h3>Studio</h3>
+                    <div
+                        class="price"
+                        style="
+                            font-size: 3rem;
+                            font-weight: 700;
+                            margin: 15px 0;
+                        "
+                    >
+                        $<span id="price-studio-amount">99</span>
+                        <span
+                            id="price-studio-period"
+                            style="
+                                font-size: 1rem;
+                                color: var(--text-muted);
+                                font-weight: 400;
+                            "
+                            >/oy</span
+                        >
+                    </div>
+                    <p
+                        style="
+                            color: var(--text-muted);
+                            font-size: 0.9rem;
+                            margin-bottom: 30px;
+                        "
+                    >
+                        Professional agentliklar va jamoalar uchun.
+                    </p>
+                    <ul
+                        class="features-list"
+                        style="
+                            margin-bottom: 30px;
+                            display: flex;
+                            flex-direction: column;
+                            gap: 15px;
+                        "
+                    >
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            300 daqiqa video/oy
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            Jamoaviy boshqaruv (5 kishi)
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            To'liq API kirish
+                        </li>
+                        <li
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                align-items: center;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-check-circle"
+                                style="color: #8b5cf6"
+                            ></i>
+                            Maxsus menejer
+                        </li>
+                    </ul>
+                    <a
+                        href="/register"
+                        class="btn btn-outline"
+                        style="width: 100%; margin-top: auto"
+                    >
+                        Hozir boshlash
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logos Section Removed -->
+
+        <!-- FAQ Section -->
+        <section
+            class="faq-section"
+            style="padding: 100px 20px; max-width: 900px; margin: 0 auto"
+        >
+            <h2
+                style="
+                    text-align: center;
+                    font-size: 2.5rem;
+                    margin-bottom: 50px;
+                "
+            >
+                Ko’p so’raladigan savollar
+            </h2>
+            <div
+                class="faq-grid"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px"
+            >
+                <div
+                    class="faq-card"
+                    style="
+                        background: var(--bg-card);
+                        padding: 30px;
+                        border-radius: 12px;
+                        border: 1px solid var(--border-color);
+                    "
+                >
+                    <h4 style="margin-bottom: 10px; font-size: 1.1rem">
+                        Qachon tarifni o’zgartira olaman?
+                    </h4>
+                    <p
+                        style="
+                            color: var(--text-muted);
+                            font-size: 0.9rem;
+                            line-height: 1.5;
+                        "
+                    >
+                        Siz istalgan vaqtda tarifingizni oshirishingiz yoki
+                        bekor qilishingiz mumkin. O’zgarish darhol kuchga
+                        kiradi.
+                    </p>
+                </div>
+                <div
+                    class="faq-card"
+                    style="
+                        background: var(--bg-card);
+                        padding: 30px;
+                        border-radius: 12px;
+                        border: 1px solid var(--border-color);
+                    "
+                >
+                    <h4 style="margin-bottom: 10px; font-size: 1.1rem">
+                        Voice Cloning qanday ishlaydi?
+                    </h4>
+                    <p
+                        style="
+                            color: var(--text-muted);
+                            font-size: 0.9rem;
+                            line-height: 1.5;
+                        "
+                    >
+                        Shunchaki 30 soniyalik audio namunani yuklaysiz va AI
+                        sizning ovozingizni aniq nusxasini yaratadi.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer
+            style="
+                padding: 60px 20px;
+                border-top: 1px solid var(--border-color);
+                margin-top: 50px;
+            "
+        >
+            <div
+                style="
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    display: grid;
+                    grid-template-columns: 2fr 1fr 1fr 1fr;
+                    gap: 40px;
+                "
+            >
+                <div>
+                    <div class="brand" style="margin-bottom: 20px">
+                        <i class="ph-fill ph-microphone-stage brand-icon"></i>
+                        <span>AI Dub</span>
+                    </div>
+                    <p style="color: var(--text-muted); line-height: 1.6">
+                        Biz video kontent yaratuvchilarga o'z g'oyalarini dunyo
+                        bo'ylab tarqatishda yordam beramiz. Sun'iy intellekt
+                        orqali til to'siqlarini parchalaymiz.
+                    </p>
+                </div>
+                <div>
+                    <h4
+                        style="
+                            margin-bottom: 20px;
+                            font-size: 0.9rem;
+                            letter-spacing: 1px;
+                        "
+                    >
+                        PLATFORMA
+                    </h4>
+                    <div
+                        style="display: flex; flex-direction: column; gap: 10px"
+                    >
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                text-decoration: none;
+                            "
+                            >API</a
+                        >
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                text-decoration: none;
+                            "
+                            >Xavfsizlik</a
+                        >
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                text-decoration: none;
+                            "
+                            >Hujjatlar</a
+                        >
+                    </div>
+                </div>
+                <div>
+                    <h4
+                        style="
+                            margin-bottom: 20px;
+                            font-size: 0.9rem;
+                            letter-spacing: 1px;
+                        "
+                    >
+                        KOMPANIYA
+                    </h4>
+                    <div
+                        style="display: flex; flex-direction: column; gap: 10px"
+                    >
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                text-decoration: none;
+                            "
+                            >Biz haqimizda</a
+                        >
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                text-decoration: none;
+                            "
+                            >Blog</a
+                        >
+                        <a
+                            href="#"
+                            style="
+                                color: var(--text-muted);
+                                text-decoration: none;
+                            "
+                            >Vakansiyalar</a
+                        >
+                    </div>
+                </div>
+                <div>
+                    <h4
+                        style="
+                            margin-bottom: 20px;
+                            font-size: 0.9rem;
+                            letter-spacing: 1px;
+                        "
+                    >
+                        IJTIMOIY
+                    </h4>
+                    <div style="display: flex; gap: 15px">
+                        <i
+                            class="ph-fill ph-globe"
+                            style="font-size: 1.5rem; color: var(--text-muted)"
+                        ></i>
+                        <i
+                            class="ph-fill ph-instagram-logo"
+                            style="font-size: 1.5rem; color: var(--text-muted)"
+                        ></i>
+                        <i
+                            class="ph-fill ph-telegram-logo"
+                            style="font-size: 1.5rem; color: var(--text-muted)"
+                        ></i>
+                    </div>
+                </div>
+            </div>
+            <div
+                style="
+                    max-width: 1200px;
+                    margin: 50px auto 0;
+                    border-top: 1px solid rgba(255, 255, 255, 0.05);
+                    padding-top: 30px;
+                    display: flex;
+                    justify-content: space-between;
+                    color: var(--text-muted);
+                    font-size: 0.8rem;
+                "
+            >
+                <div>© 2026 AI Dub. Barcha huquqlar himoyalangan.</div>
+                <div style="display: flex; gap: 20px">
+                    <a
+                        href="#"
+                        style="color: var(--text-muted); text-decoration: none"
+                        >Maxfiylik siyosati</a
+                    >
+                    <a
+                        href="#"
+                        style="color: var(--text-muted); text-decoration: none"
+                        >Foydalanish shartlari</a
+                    >
+                </div>
+            </div>
+        </footer>
+
+        <!-- Recording Modal -->
+        <div id="recording-modal" class="modal-overlay">
+            <div
+                class="modal-content"
+                style="max-width: 400px; text-align: center"
+            >
+                <div class="modal-header" style="justify-content: center">
+                    Ovoz Yozish
+                </div>
+                <div class="modal-body">
+                    <div id="recording-status" style="margin-bottom: 20px">
+                        <div
+                            style="
+                                width: 80px;
+                                height: 80px;
+                                background: rgba(239, 68, 68, 0.1);
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                margin: 0 auto 15px;
+                            "
+                        >
+                            <i
+                                class="ph-fill ph-microphone"
+                                style="font-size: 2.5rem; color: #ef4444"
+                            ></i>
+                        </div>
+                        <div
+                            id="recording-timer"
+                            style="
+                                font-size: 2rem;
+                                font-weight: 700;
+                                font-family: monospace;
+                            "
+                        >
+                            00:00
+                        </div>
+                        <div
+                            style="
+                                color: var(--text-muted);
+                                font-size: 0.9rem;
+                                margin-top: 5px;
+                            "
+                        >
+                            Yozilmoqda...
+                        </div>
+                    </div>
+
+                    <div
+                        style="
+                            display: flex;
+                            gap: 15px;
+                            justify-content: center;
+                        "
+                    >
+                        <button
+                            id="stop-recording-btn"
+                            class="btn btn-primary"
+                            style="background: #ef4444; color: white"
+                        >
+                            <i class="ph-fill ph-stop"></i> To'xtatish
+                        </button>
+                        <button
+                            id="cancel-recording-btn"
+                            class="btn btn-outline"
+                        >
+                            Bekor qilish
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Script for interaction -->
-    <script src="/static/script.js"></script>
-</body>
-
+        <!-- Script for interaction -->
+        <!-- Script for interaction -->
+        <script src="/static/script.js?v=2"></script>
+    </body>
 </html>

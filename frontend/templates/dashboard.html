@@ -1,13 +1,170 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio - AI Dublyaj</title>
+    <title>Dashboard - AI Dubbing</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="icon" href="/favicon.ico">
+    <style>
+        /* Dashboard specific implementation */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            /* Match sidebar width */
+            padding: 30px 40px;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .user-menu:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .card-preview {
+            height: 160px;
+            background: #1e2530;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 2rem;
+            position: relative;
+        }
+
+        .card-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-white);
+        }
+
+        .card-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: auto;
+            width: fit-content;
+        }
+
+        .status-ready {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+
+        .status-processing {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            color: var(--text-muted);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -16,164 +173,147 @@
 
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="ph-fill ph-microphone-stage" style="color:var(--primary); font-size: 1.5rem;"></i>
-                <span>AI Dublyaj</span>
+            <div class="sidebar-header" style="margin-bottom: 40px; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-icon"
+                    style="width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: black;">
+                    <i class="ph-fill ph-video-camera" style="font-size: 1.2rem;"></i>
+                </div>
+                <span style="font-size: 1.2rem; font-weight: 700;">AI Dubbing</span>
             </div>
 
             <div class="menu-group">
-                <div class="menu-group-label">Workspace</div>
-                <div class="nav-item active">
-                    <i class="ph ph-squares-four"></i> Project Dashboard
-                </div>
-                <div class="nav-item">
-                    <i class="ph ph-folder"></i> Shared Files
-                </div>
-            </div>
-
-            <div class="menu-group" style="margin-top: 30px;">
-                <div class="menu-group-label">Recent Projects</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); padding: 5px;">No recent projects</div>
+                <div class="menu-group-label"
+                    style="text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px; letter-spacing: 0.5px;">
+                    Workspace</div>
+                <a href="#" class="nav-item active"
+                    style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--text-white); text-decoration: none; background: rgba(255,255,255,0.05); margin-bottom: 5px;">
+                    <i class="ph ph-squares-four"></i> Projects
+                </a>
+                <a href="#" class="nav-item"
+                    style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--text-muted); text-decoration: none; transition: 0.2s;">
+                    <i class="ph ph-users"></i> Shared
+                </a>
+                <a href="#" class="nav-item"
+                    style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: var(--text-muted); text-decoration: none; transition: 0.2s;">
+                    <i class="ph ph-gear"></i> Settings
+                </a>
             </div>
 
             <div style="margin-top: auto;">
-                <div style="background: var(--bg-card); padding: 15px; border-radius: 8px;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
-                        <span style="font-size:0.8rem; font-weight:600;">Storage</span>
-                        <span style="font-size:0.8rem; color: #2ecc71;">82%</span>
-                    </div>
-                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;">
-                        <div style="width: 82%; height: 100%; background: var(--primary); border-radius: 2px;"></div>
-                    </div>
-                    <button class="btn btn-outline"
-                        style="width: 100%; margin-top: 15px; font-size: 0.8rem; padding: 8px;">Upgrade Plan</button>
-                </div>
+                <a href="/api/logout" class="nav-item"
+                    style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; color: #ef4444; text-decoration: none; transition: 0.2s;">
+                    <i class="ph ph-sign-out"></i> Sign Out
+                </a>
             </div>
         </aside>
 
-        <!-- Main Editor -->
-        <main class="main-editor">
-            <div class="top-bar">
-                <div class="breadcrumbs">Projects > <span>Tech Review - EN to UZ</span></div>
-                <div style="display: flex; gap: 10px;">
-                    <button id="save-btn" class="btn btn-outline" style="padding: 8px 16px;" title="Saqlash"><i
-                            class="ph ph-floppy-disk"></i></button>
-                    <button id="delete-btn" class="btn btn-outline"
-                        style="padding: 8px 16px; border-color: #ef4444; color: #ef4444;" title="O'chirish"><i
-                            class="ph ph-trash"></i></button>
-                    <button class="btn btn-primary" style="padding: 8px 16px;"><i class="ph ph-export"></i>
-                        Export</button>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-header">
+                <div>
+                    <h1 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 5px;">My Projects</h1>
+                    <p style="color: var(--text-muted);">Manage your video dubbing projects</p>
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="openModal()"
+                        style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
+                        <i class="ph ph-plus-circle" style="font-size: 1.1rem;"></i> New Project
+                    </button>
                 </div>
             </div>
 
-            <div class="editor-workspace">
-                <div class="video-container">
-                    <video id="main-video" controls style="width: 100%; height: 100%; object-fit: contain;">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-            </div>
-
-            <div class="bottom-panel"
-                style="background: var(--bg-card); border-top: 1px solid var(--border-color); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; gap: 20px;">
-                    <div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
-                            Transcription</div>
-                        <div style="font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-                            <div style="width: 8px; height: 8px; background: #2ecc71; border-radius: 50%;"></div>
-                            Ready
-                        </div>
+            {% if projects %}
+            <div class="project-grid">
+                {% for project in projects %}
+                <div class="project-card">
+                    <div class="card-preview">
+                        {% if project.thumbnail %}
+                        <img src="{{ project.thumbnail }}" alt="Thumbnail">
+                        {% else %}
+                        <i class="ph ph-video"></i>
+                        {% endif %}
                     </div>
-                    <div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">AI
-                            Translation</div>
-                        <div style="font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-                            <div style="width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%;">
-                            </div>
-                            Waiting
-                        </div>
+                    <div class="card-body">
+                        <div class="card-title">{{ project.title }}</div>
+                        <div class="card-meta">Created {{ project.created_at.strftime('%b %d, %Y') }}</div>
+
+                        {% if project.status == 'Ready' %}
+                        <div class="status-badge status-ready"><i class="ph-fill ph-check-circle"></i> Ready</div>
+                        {% elif project.status == 'Processing' %}
+                        <div class="status-badge status-processing"><i class="ph-fill ph-spinner"></i> Processing</div>
+                        {% elif project.status == 'Error' %}
+                        <div class="status-badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;"><i
+                                class="ph-fill ph-warning"></i> Error</div>
+                        {% if project.error_message %}
+                        <div style="font-size: 0.7rem; color: #ef4444; margin-top: 5px;">{{ project.error_message[:50]
+                            }}...</div>
+                        {% endif %}
+                        {% else %}
+                        <div class="status-badge" style="background: rgba(255,255,255,0.1); color: var(--text-muted);">
+                            <i class="ph ph-hourglass"></i> {{ project.status }}</div>
+                        {% endif %}
                     </div>
                 </div>
-
-                <div style="display: flex; gap: 15px;">
-                    <button id="translate-btn" class="btn btn-primary"><i class="ph-fill ph-magic-wand"></i> Translate
-                        (Uzbek)</button>
-                </div>
+                {% endfor %}
             </div>
+            {% else %}
+            <div class="empty-state">
+                <div
+                    style="width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem; color: var(--text-muted);">
+                    <i class="ph ph-film-strip"></i>
+                </div>
+                <h3 style="font-size: 1.2rem; margin-bottom: 10px;">No projects yet</h3>
+                <p style="margin-bottom: 25px; max-width: 400px; margin: 0 auto 25px;">Start by creating your first
+                    video dubbing project to see the magic happen.</p>
+                <button class="btn btn-primary" onclick="openModal()">Create Project</button>
+            </div>
+            {% endif %}
+
         </main>
-
-        <!-- Transcript Sidebar -->
-        <aside class="transcript-sidebar">
-            <div class="transcript-header">
-                <span>Transcript Editor</span>
-                <button id="notes-btn" class="btn btn-outline"
-                    style="padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; height: 28px; display: flex; align-items: center; gap: 6px;">
-                    <i class="ph ph-magic-wand"></i> AI Notes
-                </button>
-            </div>
-
-            <div style="padding: 15px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px; font-weight: 600;">AUDIO
-                    SOZLAMALAR</div>
-
-                <div style="margin-bottom: 10px;">
-                    <label
-                        style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Ovoz</label>
-                    <select id="voice-select"
-                        style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 6px; border-radius: 4px;">
-                        <option value="uz-UZ-MadinaNeural">Madina (Ayol)</option>
-                        <option value="uz-UZ-SardorNeural">Sardor (Erkak)</option>
-                    </select>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div>
-                        <label
-                            style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Tezlik:
-                            <span id="rate-value">+0%</span></label>
-                        <input type="range" id="rate-range" min="-50" max="50" value="0" step="5" style="width: 100%;">
-                    </div>
-                    <div>
-                        <label
-                            style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Ton:
-                            <span id="pitch-value">+0Hz</span></label>
-                        <input type="range" id="pitch-range" min="-20" max="20" value="0" step="2" style="width: 100%;">
-                    </div>
-                </div>
-            </div>
-
-            <div class="transcript-columns">
-                <span>Time</span>
-                <span>Original (EN)</span>
-                <span>Uzbek (UZ)</span>
-            </div>
-
-            <div class="transcript-body" id="transcript-body">
-                <!-- Segments will be loaded here -->
-                <div style="padding: 20px; text-align: center; color: var(--text-muted);">
-                    Loading project data...
-                </div>
-            </div>
-        </aside>
-
     </div>
-    <!-- AI Notes Modal -->
-    <div id="notes-modal" class="modal-overlay">
+
+    <!-- New Project Modal -->
+    <div id="new-project-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <span style="display:flex; align-items:center; gap:10px;"><i class="ph-fill ph-magic-wand"
-                        style="color:var(--primary); font-size:1.2rem;"></i> AI Meeting Notes</span>
-                <button class="modal-close" id="close-notes-modal"><i class="ph ph-x"></i></button>
+                <span>New Project</span>
+                <button class="modal-close" onclick="closeModal()"><i class="ph ph-x"></i></button>
             </div>
-            <div class="modal-body" id="notes-body">
-                <!-- Content will be injected here -->
+            <div class="modal-body">
+                <form action="/api/projects" method="POST">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">YouTube URL</label>
+                        <input type="text" name="youtube_url" placeholder="https://youtube.com/..." required
+                            style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white;">
+                    </div>
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Project Title
+                            (Optional)</label>
+                        <input type="text" name="title" placeholder="My Awesome Video"
+                            style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.2); color: white;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Project</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <script src="/static/script.js"></script>
-    </div>
+    <script>
+        const modal = document.getElementById('new-project-modal');
+
+        function openModal() {
+            modal.classList.add('open');
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+        }
+
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    </script>
 
 </body>
 

@@ -13,7 +13,8 @@ def generate_meeting_notes(text: str, language: str = "uz"):
 
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Updated to available model
+        model = genai.GenerativeModel('gemini-flash-latest')
 
         prompt = f"""
         Act as a professional AI assistant. Analyze the following transcript and generate concise "Meeting Notes" similar to Notion AI.

@@ -384,3 +384,9 @@ youtube-transcript-api==1.2.0
 yt-dlp==2025.12.8
 zope.interface==8.0.1
 zstandard==0.23.0
+passlib[bcrypt]
+python-jose[cryptography]
+passlib[bcrypt]
+python-jose[cryptography]
+sqlalchemy
+argon2-cffi

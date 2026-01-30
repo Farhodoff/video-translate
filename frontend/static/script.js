@@ -69,6 +69,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
+    // PRICING TOGGLE LOGIC
+    // ==========================================
+    const btnMonthly = document.getElementById('btn-monthly');
+    const btnAnnual = document.getElementById('btn-annual');
+    const priceProAmount = document.getElementById('price-pro-amount');
+    const priceProPeriod = document.getElementById('price-pro-period');
+    const priceStudioAmount = document.getElementById('price-studio-amount');
+    const priceStudioPeriod = document.getElementById('price-studio-period');
+
+    if (btnMonthly && btnAnnual) {
+        console.log("Pricing Toggle Logic Initialized");
+        btnMonthly.addEventListener('click', () => {
+            // Activate Monthly
+            btnMonthly.classList.add('active');
+            btnMonthly.style.background = 'var(--bg-dark)';
+            btnMonthly.style.color = 'white';
+
+            btnAnnual.classList.remove('active');
+            btnAnnual.style.background = 'transparent';
+            btnAnnual.style.color = 'var(--text-muted)';
+
+            // Update Prices
+            priceProAmount.innerText = '29';
+            priceProPeriod.innerText = '/oy';
+            priceStudioAmount.innerText = '99';
+            priceStudioPeriod.innerText = '/oy';
+        });
+
+        btnAnnual.addEventListener('click', () => {
+            // Activate Annual
+            btnAnnual.classList.add('active');
+            btnAnnual.style.background = 'var(--bg-dark)';
+            btnAnnual.style.color = 'white';
+
+            btnMonthly.classList.remove('active');
+            btnMonthly.style.background = 'transparent';
+            btnMonthly.style.color = 'var(--text-muted)';
+
+            // Update Prices
+            priceProAmount.innerText = '278';
+            priceProPeriod.innerText = '/yil';
+            priceStudioAmount.innerText = '950';
+            priceStudioPeriod.innerText = '/yil';
+        });
+    }
+
+    // ==========================================
     // LANDING PAGE LOGIC
     // ==========================================
     function initLandingPage() {

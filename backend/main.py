@@ -1,4 +1,7 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
+from backend import database
+from backend.models import models
+from backend.services import auth
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -10,6 +13,9 @@ load_dotenv()
 
 
 app = FastAPI()
+
+# Create Tables
+models.Base.metadata.create_all(bind=database.engine)
 
 # Mounts
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
@@ -33,8 +39,25 @@ async def favicon():
     return FileResponse("frontend/static/favicon.png")
 
 @app.get("/dashboard")
-async def dashboard(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+async def dashboard(
+    request: Request,
+    user: models.User = Depends(auth.get_current_user_or_redirect),
+    db: database.SessionLocal = Depends(database.get_db)
+):
+    projects = db.query(models.Project).filter(models.Project.user_id == user.id).all()
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "user": user,
+        "projects": projects
+    })
+
+@app.get("/login")
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/register")
+async def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 if __name__ == "__main__":
     import uvicorn
