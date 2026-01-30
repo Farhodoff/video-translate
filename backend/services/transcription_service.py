@@ -38,3 +38,11 @@ def transcribe_video(video_path: str, quality: str = "standard"):
     except Exception as e:
         print(f"Error during transcription: {e}")
         raise e
+
+def transcribe_file(video_path: str, output_json: str = None, quality: str = "standard"):
+    """Alias for transcribe_video for backward compatibility"""
+    segments = transcribe_video(video_path, quality)
+    if output_json:
+        with open(output_json, 'w', encoding='utf-8') as f:
+            json.dump(segments, f, ensure_ascii=False, indent=2)
+    return segments

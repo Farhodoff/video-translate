@@ -21,10 +21,7 @@ from backend.models.schemas import TranslationRequest, ProjectUpdateRequest
 router = APIRouter(prefix="/api")
 UPLOAD_DIR = "uploads"
 
-router = APIRouter(prefix="/api")
-UPLOAD_DIR = "uploads"
-
-def process_project_video(project_id: int, url: str, db: Session):
+async def process_project_video(project_id: int, url: str, db: Session):
     try:
         # 1. Fetch project (re-query to ensure session is fresh)
         project = db.query(models.Project).filter(models.Project.id == project_id).first()
