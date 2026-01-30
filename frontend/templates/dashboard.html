@@ -250,7 +250,17 @@
                         {% endif %}
                         {% else %}
                         <div class="status-badge" style="background: rgba(255,255,255,0.1); color: var(--text-muted);">
-                            <i class="ph ph-hourglass"></i> {{ project.status }}</div>
+                            <i class="ph ph-hourglass"></i> {{ project.status }}
+                        </div>
+                        {% endif %}
+                        {% if project.transcript %}
+                        <div style="display: none;" id="transcript-data-{{ project.id }}">
+                            {{ project.transcript | tojson | safe }}
+                        </div>
+                        <button class="btn btn-outline" onclick="viewProjectTranscript('{{ project.id }}')"
+                            style="margin-top: 10px; width: 100%; font-size: 0.8rem; padding: 8px;">
+                            <i class="ph ph-article"></i> View Transcript
+                        </button>
                         {% endif %}
                     </div>
                 </div>
@@ -298,6 +308,22 @@
         </div>
     </div>
 
+    <!-- Transcript Modal -->
+    <div id="transcript-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <span>Transcript</span>
+                <button class="modal-close" onclick="closeTranscriptModal()"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body" id="transcript-content" style="max-height: 60vh; overflow-y: auto;">
+                <!-- Content will be injected here -->
+            </div>
+            <div style="padding: 20px; border-top: 1px solid var(--border-color); text-align: right;">
+                <button class="btn btn-primary" onclick="closeTranscriptModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const modal = document.getElementById('new-project-modal');
 
@@ -312,6 +338,60 @@
         // Close on outside click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
+        });
+
+        const transcriptModal = document.getElementById('transcript-modal');
+        const transcriptContent = document.getElementById('transcript-content');
+
+        function viewProjectTranscript(projectId) {
+            try {
+                const dataDiv = document.getElementById(`transcript-data-${projectId}`);
+                if (dataDiv) {
+                    const transcriptData = JSON.parse(dataDiv.textContent);
+                    openTranscriptModal(transcriptData);
+                }
+            } catch (e) {
+                console.error("Error parsing transcript:", e);
+                alert("Failed to load transcript data.");
+            }
+        }
+
+        function openTranscriptModal(transcriptData) {
+            let html = '';
+            if (transcriptData && transcriptData.length > 0) {
+                html += '<div style="display: flex; flex-direction: column; gap: 15px;">';
+                transcriptData.forEach(segment => {
+                    html += `
+                        <div style="display: flex; gap: 15px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                            <div style="min-width: 80px; color: var(--primary); font-family: monospace; font-size: 0.85rem;">
+                                ${formatTime(segment.start)}
+                            </div>
+                            <div style="color: #e2e8f0; line-height: 1.5;">
+                                ${segment.text}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            } else {
+                html = '<p style="color: var(--text-muted); text-align: center;">No transcript available.</p>';
+            }
+            transcriptContent.innerHTML = html;
+            transcriptModal.classList.add('open');
+        }
+
+        function closeTranscriptModal() {
+            transcriptModal.classList.remove('open');
+        }
+
+        function formatTime(seconds) {
+            const date = new Date(0);
+            date.setSeconds(seconds);
+            return date.toISOString().substr(14, 5);
+        }
+
+        transcriptModal.addEventListener('click', (e) => {
+            if (e.target === transcriptModal) closeTranscriptModal();
         });
     </script>
 

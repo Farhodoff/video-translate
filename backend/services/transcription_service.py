@@ -14,14 +14,21 @@ def get_model():
         print("Whisper tayyor!")
     return _model
 
-def transcribe_file(file_path: str, output_path: str):
-    model = get_model()
-    result = model.transcribe(file_path)
-    
-    # MOCK RESULT REMOVED
-    
-    # Save JSON
-    with open(output_path, "w", encoding='utf-8') as f:
-        json.dump(result, f, ensure_ascii=False, indent=4)
+def transcribe_video(video_path: str):
+    """
+    Transcribes a video file using OpenAI Whisper.
+    Returns a list of segments with start, end, and text.
+    """
+    if not os.path.exists(video_path):
+        raise FileNotFoundError(f"Video file not found: {video_path}")
+
+    try:
+        model = get_model()
+        result = model.transcribe(video_path)
         
-    return result['segments']
+        # We can also save it if needed, but for now just return
+        # keys: text, segments, language
+        return result["segments"]
+    except Exception as e:
+        print(f"Error during transcription: {e}")
+        raise e

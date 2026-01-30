@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from backend.database import Base
@@ -23,6 +23,7 @@ class Project(Base):
     video_url = Column(String, nullable=True)
     thumbnail = Column(String, nullable=True)
     error_message = Column(String, nullable=True) # For handling failed downloads
+    transcript = Column(JSON, nullable=True) # Store segments as JSON
     created_at = Column(DateTime, default=datetime.utcnow)
 
     owner = relationship("User", back_populates="projects")

@@ -41,14 +41,22 @@ def process_project_video(project_id: int, url: str, db: Session):
         filename = f"{project_id}_{int(time.time())}.mp4"
         output_path = video_service.download_video(url, UPLOAD_DIR, filename)
 
-        # 4. Update
+        # 4. Transcribe
         project.video_url = f"/uploads/{os.path.basename(output_path)}"
+        project.status = "Transcribing"
+        db.commit()
+
+        print(f"Starting transcription for project {project_id}...")
+        transcript = transcription_service.transcribe_video(output_path)
+        project.transcript = transcript
+        
+        # 5. Complete
         project.status = "Ready"
         db.commit()
     except Exception as e:
         print(f"Error processing project {project_id}: {e}")
         project.status = "Error"
-        project.error_message =str(e)
+        project.error_message = str(e)
         db.commit()
 
 @router.post("/projects")
