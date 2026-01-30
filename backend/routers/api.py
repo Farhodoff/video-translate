@@ -46,8 +46,8 @@ def process_project_video(project_id: int, url: str, db: Session):
         project.status = "Transcribing"
         db.commit()
 
-        print(f"Starting transcription for project {project_id}...")
-        transcript = transcription_service.transcribe_video(output_path)
+        print(f"Starting transcription for project {project_id} (Quality: {project.quality})...")
+        transcript = transcription_service.transcribe_video(output_path, quality=project.quality)
         project.transcript = transcript
         
         # 5. Translate
@@ -94,6 +94,7 @@ async def create_project(
     background_tasks: BackgroundTasks,
     youtube_url: str = Form(...),
     title: str = Form(None),
+    quality: str = Form("standard"),
     user: models.User = Depends(auth.get_current_user),
     db: Session = Depends(database.get_db)
 ):
@@ -102,6 +103,7 @@ async def create_project(
         user_id=user.id,
         title=title or "New Project",
         status="Processing",
+        quality=quality,
         video_url=None, # Will be set after download
         thumbnail=None
     )

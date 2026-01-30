@@ -27,6 +27,7 @@ class Project(Base):
     translated_transcript = Column(JSON, nullable=True) # Store translated segments
     dubbed_audio_url = Column(String, nullable=True) # URL to dubbed audio
     final_video_url = Column(String, nullable=True) # URL to final merged video
+    quality = Column(String, default="standard") # tiny, standard (base), high (small)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     owner = relationship("User", back_populates="projects")
